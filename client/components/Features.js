@@ -1,45 +1,58 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 // import { Icon } from "@/components/ui/icon";
-import { icons } from "lucide-react";
+import { BadgeCheck, Goal, icons, MousePointerClick, Newspaper, PictureInPicture, Smartphone } from "lucide-react";
 
 const featureList = [
   {
-    icon: "TabletSmartphone",
-    title: "Mobile Friendly",
+    icon: <Smartphone  size={24}
+    color="hsl(var(--primary))"
+    className="text-primary"></Smartphone>,
+    title: "Mobile Accessibility",
     description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. A odio velit cum aliquam, consectetur.",
+      "Easily contribute to fundraising campaigns from any device. Our Web3 app is designed to be fully responsive, providing access on the go.",
   },
   {
-    icon: "BadgeCheck",
-    title: "Social Proof",
+    icon: <BadgeCheck  size={24}
+    color="hsl(var(--primary))"
+    className="text-primary"></BadgeCheck>,
+    title: "Verified Projects",
     description:
-      "Lorem ipsum dolor sit amet consectetur. Natus consectetur, odio ea accusamus aperiam.",
+      "All campaigns are verified using blockchain technology to ensure transparency and trust. Investors can feel confident knowing they’re supporting legitimate causes.",
   },
   {
-    icon: "Goal",
-    title: "Targeted Content",
+    icon: <Goal  size={24}
+    color="hsl(var(--primary))"
+    className="text-primary"></Goal>,
+    title: "Decentralized Funding",
+    description: "Harness the power of blockchain to raise funds in a decentralized manner. No middleman, just direct contributions between backers and creators.",
+  },
+  
+  {
+    icon: <PictureInPicture  size={24}
+    color="hsl(var(--primary))"
+    className="text-primary"></PictureInPicture>,
+    title: "Engaging Campaigns",
     description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. odio ea accusamus aperiam.",
+      "Showcase your crowdfunding project with visually rich content. With support for multimedia and interactive features, make your campaign stand out.",
   },
   {
-    icon: "PictureInPicture",
-    title: "Strong Visuals",
+    icon: <MousePointerClick  size={24}
+    color="hsl(var(--primary))"
+    className="text-primary"/>,
+    title: "Easy Contributions",
     description:
-      "Lorem elit. A odio velit cum aliquam. Natus consectetur dolores, odio ea accusamus aperiam.",
+      "Contribute to your favorite projects with just a few clicks. Our Web3 app supports simple, fast transactions using cryptocurrency and digital wallets.",
   },
   {
-    icon: "MousePointerClick",
-    title: "Clear CTA",
+    icon: <Newspaper  size={24}
+    color="hsl(var(--primary))"
+    className="text-primary"/>,
+    title: "Transparent Fund Tracking",
     description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing. odio ea accusamus consectetur.",
-  },
-  {
-    icon: "Newspaper",
-    title: "Clear Headline",
-    description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. A odio velit cum aliquam. Natus consectetur.",
+      "Track the progress of each campaign with real-time data, all recorded on the blockchain for full transparency. Know exactly where your funds are going.",
   },
 ];
+
 
 export const FeaturesSection = () => {
   return (
@@ -64,6 +77,7 @@ export const FeaturesSection = () => {
             <Card className="h-full bg-background border-0 shadow-none">
               <CardHeader className="flex justify-center items-center">
                 <div className="bg-primary/20 p-2 rounded-full ring-8 ring-primary/10 mb-4">
+                {icon}
                   {/* <Icon
                     name={icon}
                     size={24}

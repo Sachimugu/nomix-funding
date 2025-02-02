@@ -1,28 +1,36 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Blocks, LineChart, Sparkle, Wallet2 } from "lucide-react";
 // import { Icon } from "@/components/ui/icon";
-import { icons } from "lucide-react";
 
 const benefitList = [
   {
-    icon: "Blocks",
+    icon: <Blocks size={32}
+    color="hsl(var(--primary))"
+    className="mb-6 text-primary"/>,
     title: "Build Brand Trust",
     description:
       "Showcase transparency, share project updates, and milestones to foster trust and credibility with your community and backers in the Web3 space.",
   },
   {
-    icon: "LineChart",
+    icon: <LineChart size={32}
+    color="hsl(var(--primary))"
+    className="mb-6 text-primary"/>,
     title: "Refund Policy",
     description:
       "Offer a transparent, fair refund policy to ensure contributors feel secure and satisfied, even if the project doesn't meet its goals.",
   },
   {
-    icon: "Wallet",
+    icon: <Wallet2 size={32}
+    color="hsl(var(--primary))"
+    className="mb-6 text-primary"/>,
     title: "Earn Airdrops",
     description:
       "Incentivize and reward contributors with airdrops, distributing exclusive tokens to engage your community and encourage participation in your fundraising efforts.",
   },
   {
-    icon: "Sparkle",
+    icon: <Sparkle size={32}
+    color="hsl(var(--primary))"
+    className="mb-6 text-primary"/>,
     title: "Test Marketing Ideas",
     description:
       "Optimize your fundraising strategies by testing marketing tactics, such as beta testing, referral programs, and influencer partnerships to boost project visibility.",
@@ -51,7 +59,7 @@ export const BenefitsSection = () => {
               className="bg-muted/50 dark:bg-card hover:bg-background transition-all delay-75 group/number"
             >
               <CardHeader>
-                <div className="flex justify-between">
+                <div className="flex justify-between">{icon}
                   {/* <Icon
                     name={icon}
                     size={32}
