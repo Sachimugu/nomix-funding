@@ -58,6 +58,10 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
+        borderAnimation: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
         "accordion-down": {
           from: { height: 0 },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -80,6 +84,7 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "collapsible-down": "collapsible-down 0.2s ease-in-out",
         "collapsible-up": "collapsible-up 0.2s ease-in-out",
+        'border-spin': 'borderAnimation 3s linear infinite',
       },
     },
   },

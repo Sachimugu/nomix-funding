@@ -51,8 +51,8 @@ export default function Home() {
     <div className="">
       <HeroSection />
       <BenefitsSection />
-      <FeaturesSection />
       <TeamSection />
+      <FeaturesSection />
       <CommunitySection />
       <FooterSection /> 
       {/* <SponsorsSection /> */}

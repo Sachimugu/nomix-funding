@@ -7,25 +7,25 @@ const benefitList = [
     icon: "Blocks",
     title: "Build Brand Trust",
     description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. A odio velit cum aliquam. Natus consectetur dolores.",
+      "Showcase transparency, share project updates, and milestones to foster trust and credibility with your community and backers in the Web3 space.",
   },
   {
     icon: "LineChart",
-    title: "More Leads",
+    title: "Refund Policy",
     description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. A odio velit cum aliquam, natus consectetur.",
+      "Offer a transparent, fair refund policy to ensure contributors feel secure and satisfied, even if the project doesn't meet its goals.",
   },
   {
     icon: "Wallet",
-    title: "Higher Conversions",
+    title: "Earn Airdrops",
     description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus consectetur. A odio velit cum aliquam",
+      "Incentivize and reward contributors with airdrops, distributing exclusive tokens to engage your community and encourage participation in your fundraising efforts.",
   },
   {
     icon: "Sparkle",
     title: "Test Marketing Ideas",
     description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. A odio velit cum aliquam. Natus consectetur dolores.",
+      "Optimize your fundraising strategies by testing marketing tactics, such as beta testing, referral programs, and influencer partnerships to boost project visibility.",
   },
 ];
 
@@ -40,9 +40,7 @@ export const BenefitsSection = () => {
             Your Shortcut to Success
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Non
-            ducimus reprehenderit architecto rerum similique facere odit
-            deleniti necessitatibus quo quae.
+          Unlock the full potential of your fundraising efforts with features designed to streamline your journey. From building trust to optimizing marketing strategies, our platform provides the tools you need to succeed in the Web3 space. Let us help you turn your vision into reality with ease and security
           </p>
         </div>
 
