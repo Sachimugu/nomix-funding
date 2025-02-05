@@ -31,7 +31,7 @@ const optionsc =  {
 const options = {   }
 
 const ConnectButton = () => {
-  const { provider, walletAddress, setProvider, setWalletAddress, reset } = useWalletStore();
+  const { provider, walletAddress, setProvider, setWalletAddress, reset, CONTRACT_ABI, CONTRACT_ADDRESS, setContract } = useWalletStore();
   
   // State for loading
   const [loading, setLoading] = useState(false);
@@ -47,13 +47,15 @@ const ConnectButton = () => {
 
       const instance = await modal.connect();
       const web3Provider = new ethers.BrowserProvider(instance);
-      console.log({ web3Provider, instance });
+      // console.log({ web3Provider, instance });
       const signer = await web3Provider.getSigner();
       const address = await signer.getAddress();
 
       // Update the global state
       setProvider(web3Provider);
       setWalletAddress(address);
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, web3Provider.getSigner());
+      setContract(contract);
     } catch (error) {
       console.log("Error connecting wallet:", error);
       alert("Failed to connect wallet. Please try again.");

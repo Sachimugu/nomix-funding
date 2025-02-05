@@ -44,9 +44,9 @@ export const HeroSection = () => {
             <SlideArrowButton className=""/>
            
             <Button
-              asChild
+              // asChild
               variant="secondary"
-              className="w-5/6 md:w-1/4 font-bold py-6 rounded-full"
+              className="font-bold py-6 rounded-full"
             >
               <Link
                 href="https://github.com/nobruf/shadcn-landing-page.git"
