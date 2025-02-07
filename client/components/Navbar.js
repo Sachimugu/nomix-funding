@@ -22,7 +22,7 @@ import { Button } from "./ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { ToggleTheme } from "./ToggleTheme";
-import ConnectButton from "./Connect-wallet";
+import ConnectButton from "./connectbutton";
 
 const routeList = [
   {

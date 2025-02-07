@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import SlideArrowButton from "./animata/button/slide-arrow-button";
 import { BackgroundLines } from "./ui/background-line";
-import ConnectButton from "./Connect-wallet";
+import ConnectButton from "./connectbutton";
 import SponsorsSection from "./Sponsors";
 
 export const HeroSection = () => {

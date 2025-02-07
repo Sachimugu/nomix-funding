@@ -9,7 +9,9 @@ contract CrowdFunding {
         uint256 goal;          // Funding goal in wei
         uint256 deadline;      // Deadline for the campaign
         uint256 totalFunds;    // Total funds raised so far
-        string description;    // Campaign description
+        string description;  
+        string imageUrl;  
+        string name; // Campaign description
         bool goalReached;      // Whether the goal has been reached
         bool isClosed;         // Whether the campaign is closed
         uint256[] donations;   // Donations made to the campaign
@@ -43,7 +45,7 @@ contract CrowdFunding {
     }
 
     // Function to create a new campaign
-    function createCampaign(uint256 _goal, uint256 _duration, string memory _description) public {
+    function createCampaign(string memory _name, string memory _description, uint256 _goal, uint256 _duration, string memory _imageUrl  ) public {
         require(_goal > 0, "Goal must be greater than 0");
         require(_duration > 0, "Duration must be greater than 0");
 
@@ -52,8 +54,10 @@ contract CrowdFunding {
             creator: msg.sender,
             goal: _goal,
             deadline: deadline,
+            imageUrl:_imageUrl,
             totalFunds: 0,
             description: _description,
+            name: _name,
             goalReached: false,
             isClosed: false,
             donors: new address[](0),          donations: new uint256[](0) 

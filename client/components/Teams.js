@@ -1,6 +1,4 @@
-// import GithubIcon from "@/components/icons/github-icon";
-// import LinkedInIcon from "@/components/icons/linkedin-icon";
-// import XIcon from "@/components/icons/x-icon";
+'use client'
 import {
   Card,
   CardContent,
@@ -8,8 +6,10 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
+import { getAllCampaigns } from "@/lib/crowdFunding";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect } from "react";
 
 const socialIcon = (socialName) => {
   switch (socialName) {
@@ -25,6 +25,26 @@ const socialIcon = (socialName) => {
 };
 
 export const TeamSection = () => {
+
+
+  useEffect(() => {
+    // Define an async function inside useEffect
+    const fetchCampaigns = async () => {
+      try {
+        const allCampaigns = await getAllCampaigns();
+        console.log("All campaigns:", allCampaigns);
+      } catch (error) {
+        console.log("Error fetching all campaigns:", error);
+      }
+    };
+  
+    // Call the async function
+    fetchCampaigns();
+  }, []);
+
+  
+
+
   const teamList = [
     {
       imageUrl: "/image",

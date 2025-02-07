@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { CreateCampaign } from "@/components/CreateCampaign";
+import { CreateCampaign } from "@/components/ContributorList";
 
 export default function SlideArrowButton({
   text = "Get Started",
@@ -9,22 +9,14 @@ export default function SlideArrowButton({
   className = "",
   ...props
 }) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const openDialog = () => {
-    setIsDialogOpen(true);
-  };
-
-  const closeDialog = () => {
-    setIsDialogOpen(false);
-  };
+  
 
   return (
     <>
       <button
         className={`group relative rounded-full border border-white bg-white p-2 text-xl font-semibold ${className}`}
         {...props}
-        onClick={openDialog}
+        
       >
         <div
           className="absolute bg-orange-600 left-0 top-0 flex h-full w-11 items-center justify-end rounded-full transition-all duration-200 ease-in-out group-hover:w-full"
@@ -39,7 +31,6 @@ export default function SlideArrowButton({
         </span>
       </button>
       {/* Pass state to CreateCampaign */}
-      <CreateCampaign isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen} />
     </>
   );
 }

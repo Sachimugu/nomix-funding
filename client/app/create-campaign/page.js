@@ -3,6 +3,8 @@ import { UploadCloud } from "lucide-react";
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import axios from "axios";
+import { createCampaign } from "@/lib/crowdFunding";
+import DatePicker from "@/components/DatePicker";
 
 
 export default function CampaignForm() {
@@ -11,6 +13,8 @@ export default function CampaignForm() {
   const [campaignTarget, setCampaignTarget] = useState("");
   const [campaignImage, setCampaignImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [duration, setDuration] = useState(null)
+  const [durationError, setDurationError] = React.useState("");
   const [errors, setErrors] = useState({
     name: "",
     description: "",
@@ -20,8 +24,10 @@ export default function CampaignForm() {
   const [theme, setTheme] = useState("light"); // Use this to toggle light/dark theme
 
   // Set up Pinata API details
-  const PINATA_API_KEY = process.env.apiKey ; // replace with your Pinata API Key
-  const PINATA_API_SECRET = process.env.apiSecret; // replace with your Pinata API Secret
+  const PINATA_API_KEY =""
+  // process.env.NEXT_PUBLIC_apiKey ; // replace with your Pinata API Key
+  const PINATA_API_SECRET = ""
+   process.env.NEXT_PUBLIC_apiSecret; // replace with your Pinata API Secret
 
   // Drag-and-Drop Image handling using `react-dropzone`
   const { getRootProps, getInputProps } = useDropzone({
@@ -63,6 +69,11 @@ export default function CampaignForm() {
       isValid = false;
     }
 
+    if (!duration){
+      setDurationError("Campaign Duration is required")
+      isValid = false;
+    }
+
     setErrors(formErrors);
 
     if (isValid) {
@@ -82,8 +93,12 @@ export default function CampaignForm() {
           campaignName,
           campaignDescription,
           campaignTarget,
+          duration,
           imageHash: ipfsHash,
         });
+
+
+        await handleCreateCampaign(campaignName, campaignDescription, campaignTarget, duration, ipfsHash,)
       } catch (err) {
         console.error("Error uploading to IPFS:", err);
         setErrors((prevErrors) => ({
@@ -96,6 +111,7 @@ export default function CampaignForm() {
 
   // Function to upload the image to Pinata
   const uploadImageToIPFS = async (image) => {
+    console.log(PINATA_API_KEY, PINATA_API_SECRET);
     const formData = new FormData();
     formData.append("file", image);
 
@@ -113,6 +129,16 @@ export default function CampaignForm() {
       throw new Error("Failed to upload image to IPFS");
     }
   };
+
+
+    // Create new campaign
+    const handleCreateCampaign = async (name, description, goal, duration, image) => {
+      try {
+        await createCampaign(name, description, parseInt(goal), parseInt(duration), image);
+      } catch (error) {
+        console.error("Error creating campaign:", error);
+      }
+    };
 
   return (
     <div
@@ -175,6 +201,7 @@ export default function CampaignForm() {
           />
           {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
         </div>
+        <DatePicker setDuration={setDuration} durationError ={durationError} setDurationError ={setDurationError}/>
 
         {/* Drag-and-Drop Image Upload */}
         <div
@@ -187,7 +214,7 @@ export default function CampaignForm() {
               <img src={imagePreview} alt="Preview" className="mx-auto mb-3 rounded-md w-32 h-32 object-cover" />
             ) : (
               <div>
-                <UploadCloud size={40} className="mx-auto text-indigo-600 mb-3" />
+                <UploadCloud size={40} className="mx-auto text-orange-600 mb-3" />
                 <p className="text-lg">Drag & Drop or Click to Select an Image</p>
               </div>
             )}
@@ -203,7 +230,7 @@ export default function CampaignForm() {
         <div className="text-center">
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-3 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-orange-600 text-white py-3 rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
           >
             Create Campaign
           </button>
