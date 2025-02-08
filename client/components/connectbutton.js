@@ -2,9 +2,9 @@
 import { Wallet } from "lucide-react";
 import React, { useState } from "react";
 import Web3Modal from "web3modal";
-import useWalletStore from "@/store/wallet-store";
+import {useWalletStore} from "@/store/wallet-store";
 import { ethers } from "ethers";
-import { connectWalletAddr, disconnectWalletAddr } from "@/lib/connect-wallet";
+// import { connectWalletAddr, disconnectWalletAddr } from "@/lib/connect-wallet";
 
 const optionsc =  {
   metamask: {
@@ -25,6 +25,16 @@ const optionsc =  {
         1: "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID",
       },
       bridge: "https://bridge.walletconnect.org",
+    },
+  },
+  custom: {
+    display: {
+      name: "Hardhat",
+      description: "Connect with your local Hardhat node",
+    },
+    package: {
+      // Custom provider for Hardhat node
+      getProvider: () => new ethers.providers.JsonRpcProvider("http://localhost:8545"), // Hardhat node URL
     },
   },
 }
@@ -48,7 +58,7 @@ const options = {
     },
   },}
 const ConnectButton = () => {
-  const { provider, walletAddress, setProvider, setWalletAddress, reset, CONTRACT_ABI, CONTRACT_ADDRESS, setContract } = useWalletStore();
+  const { walletAddress, connectWallet, disconnectWallet } = useWalletStore();
   
   // State for loading
   const [loading, setLoading] = useState(false);
@@ -83,11 +93,11 @@ const ConnectButton = () => {
   // };
 
   const handleConnectWallet = async() => {
-    await connectWalletAddr(setLoading)
+    await connectWallet(setLoading)
   }
 
   const  handleDisconnectWalletAddr= () => {
-    disconnectWalletAddr(); // Reset the global state
+    disconnectWallet(); // Reset the global state
   };
 
   return (
@@ -113,7 +123,7 @@ const ConnectButton = () => {
           className="text-gray-900 bg-white hover:bg-gray-100 border border-orange-600 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-600 dark:bg-gray-800 dark:border-gray-300 dark:text-white dark:hover:bg-gray-700 gap-2 me-2 mb-2"
         >
           <Wallet className="text-orange-600" />
-          Disconnect {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+          Disconnect {}
         </button>
       )}
     </>

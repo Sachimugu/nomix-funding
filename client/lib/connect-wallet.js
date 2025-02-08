@@ -23,6 +23,7 @@ export const connectWalletAddr = async (setLoading) => {
     setWalletAddress(address);
     const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
     setContract(contract);
+    console.log({contract, address  });
   } catch (error) {
     console.log("Error connecting wallet:", error);
     alert("Failed to connect wallet. Please try again.");

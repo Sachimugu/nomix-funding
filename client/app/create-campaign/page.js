@@ -24,11 +24,9 @@ export default function CampaignForm() {
   const [theme, setTheme] = useState("light"); // Use this to toggle light/dark theme
 
   // Set up Pinata API details
-  const PINATA_API_KEY =""
-  // process.env.NEXT_PUBLIC_apiKey ; // replace with your Pinata API Key
-  const PINATA_API_SECRET = ""
-   process.env.NEXT_PUBLIC_apiSecret; // replace with your Pinata API Secret
-
+  const PINATA_API_KEY =process.env.NEXT_PUBLIC_apiKey  // replace with your Pinata API Key
+  const PINATA_API_SECRET = process.env.NEXT_PUBLIC_apiSecret // replace with your Pinata API Secret
+  console.log(PINATA_API_KEY, PINATA_API_SECRET);
   // Drag-and-Drop Image handling using `react-dropzone`
   const { getRootProps, getInputProps } = useDropzone({
     accept: "image/*", // Allow only images

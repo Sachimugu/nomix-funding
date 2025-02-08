@@ -7,6 +7,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { getAllCampaigns } from "@/lib/crowdFunding";
+import {useWalletStore} from "@/store/wallet-store";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
@@ -25,12 +26,20 @@ const socialIcon = (socialName) => {
 };
 
 export const TeamSection = () => {
-
+        const {  contract } = useWalletStore();
+  // const [loading, setLoading] = useState(false);
+  // useEffect(() => {
+  //   reinitializeWallet(); // Reconnect wallet on app load
+  // }, [reinitializeWallet])
 
   useEffect(() => {
+    
     // Define an async function inside useEffect
     const fetchCampaigns = async () => {
+      
       try {
+        console.log({"this is a ":contract})
+        // await connectWallet(setLoading)
         const allCampaigns = await getAllCampaigns();
         console.log("All campaigns:", allCampaigns);
       } catch (error) {
