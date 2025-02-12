@@ -5,7 +5,7 @@ import Web3Modal from 'web3modal';
 import { ethers } from 'ethers';
 
 // Provider options for Web3Modal
-export const  options = {
+export const options = {
   metamask: {
     display: {
       name: "MetaMask",
@@ -37,100 +37,205 @@ export const  options = {
   },
 };
 
-// Zustand store with persistence
-export const  useWalletStore = create((set, get) => ({
-  provider: null,
-  CONTRACT_ABI: CONTRACT_ABI.abi,
-  CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS, // Use environment variable
-  walletAddress: '',
-  contract: null,
-  isLoading: false, // Manage loading state internally
-  error: null, // Track errors
+export const useWalletStore = create((set, get) => {
+  // Try to load wallet address and contract from localStorage
+  const walletAddress = localStorage.getItem('walletAddress');
+  const contractAddress = localStorage.getItem('contractAddress');
+  
+  // Initial state with persisted values (if any)
+  return {
+    provider: null,
+    contract: null,
+    walletAddress: walletAddress || null,
+    _CONTRACT_ABI: CONTRACT_ABI['abi'],
+    CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || contractAddress || "",
 
-  // Initialize the store with persisted data
-  initialize: async () => {
-    const savedWalletAddress = localStorage.getItem('walletAddress');
-    const savedContractAddress = localStorage.getItem('contractAddress');
+    setContract: (newContract) => set({ contract: newContract }),
+    setProvider: (newProvider) => set({ provider: newProvider }),
+    setWalletAddress: (newAddress) => set({ walletAddress: newAddress }),
 
-    if (savedWalletAddress && savedContractAddress) {
-      set({ walletAddress: savedWalletAddress });
+    connectWallet: async () => {
+      console.log('abi...',CONTRACT_ABI['abi'] );
+      const { walletAddress, contract } = get();
+    
+      // If wallet is already connected, no need to reconnect
+      if (walletAddress) {
+        console.log('Wallet already connected:', walletAddress);
+        return; // Exit early if the wallet is already connected
+      }
+    
       try {
+        if (!process.env.NEXT_PUBLIC_CONTRACT_ADDRESS) {
+          throw new Error('Contract address is not defined.');
+        }
+    
+        // Initialize Web3Modal
         const modal = new Web3Modal({
           cacheProvider: true, // Persist user's wallet choice
-          providerOptions: options,
+          providerOptions: options, // Your wallet provider options
         });
-
+    
+        // Connect wallet using Web3Modal
         const instance = await modal.connect();
         const web3Provider = new ethers.BrowserProvider(instance);
         const signer = await web3Provider.getSigner();
-        const contract = new ethers.Contract(savedContractAddress, get().CONTRACT_ABI, signer);
-        set({ provider: web3Provider, contract });
+        const address = await signer.getAddress();
+    
+        // Update store with provider and wallet address
+        set({ provider: web3Provider, walletAddress: address });
+    
+        // Create contract instance with signer
+        const newContract = new ethers.Contract(
+          process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+          CONTRACT_ABI['abi'], // Ensure you have the correct ABI
+          signer
+        );
+    
+        // Update contract state
+        set({ contract: newContract });
+    
+        // Ensure contract state is set
+        const updatedContract = get().contract;
+    
+        if (updatedContract) {
+          console.log('Successfully connected to contract:', updatedContract);
+        } else {
+          console.error('Contract is not available after setting.');
+        }
+    
+        // Save wallet and contract data to localStorage
+        localStorage.setItem('walletAddress', address);
+        localStorage.setItem('contractAddress', process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
+    
       } catch (error) {
-        console.error("Error reconnecting wallet:", error);
-        localStorage.removeItem('walletAddress');
-        localStorage.removeItem('contractAddress');
-        set({ error: "Failed to reconnect wallet. Please connect again." });
+        console.error('Error connecting wallet:', error);
       }
-    }
-  },
+    },
+    
 
-  connectWallet: async () => {
-    set({ isLoading: true, error: null });
-    try {
-      const modal = new Web3Modal({
-        cacheProvider: true, // Persist user's wallet choice
-        providerOptions: options,
+    // Function for calling a state-changing contract method (requires signer)
+    callTransactionFunction: async (methodName, ...params) => {
+      const { contract, walletAddress } = get();
+
+      // Check if walletAddress is available
+      if (!walletAddress) {
+        console.log('Wallet not connected. Connecting...');
+        const {connectWallet} = get()
+        await connectWallet() // Automatically connect the wallet
+      }
+
+      // Check if contract is available and connect if necessary
+      if (!contract) {
+        console.log('Contract not available. Connecting wallet...');
+        const modal = new Web3Modal({
+          cacheProvider: true, // Persist user's wallet choice
+          providerOptions: options, // Your wallet provider options
+        });
+    
+        // Connect wallet using Web3Modal
+        const instance = await modal.connect();
+        const web3Provider = new ethers.BrowserProvider(instance);
+        const signer = await web3Provider.getSigner();
+        const address = await signer.getAddress();
+    
+        // Update store with provider and wallet address
+        set({ provider: web3Provider, walletAddress: address });
+    
+        // Create contract instance with signer
+        const newContract = new ethers.Contract(
+          process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+          CONTRACT_ABI['abi'], // Ensure you have the correct ABI
+          signer
+        );// Attempt to connect wallet and set contract
+        set({ contract: newContract });
+    ; // Ensure contract is available
+      }
+
+      // Now that the contract is available, proceed with calling the function
+      const { contract: updatedContract } = get();
+
+      try {
+        const tx = await updatedContract[methodName](...params);
+        console.log(`Transaction sent: ${tx.hash}`);
+
+        // Wait for the transaction to be mined
+        const receipt = await tx.wait();
+        console.log(`Transaction mined: ${receipt.transactionHash}`);
+
+        return receipt; // Return the transaction receipt
+      } catch (error) {
+        console.error('Error calling transaction function:', error);
+      }
+    },
+
+
+    callReadOnlyFunction: async (methodName, ...params) => {
+      const { contract, provider, walletAddress } = get();
+    
+      // If contract is not available, connect wallet
+      if (!contract) {
+        console.log('Contract not available. Connecting wallet...');
+        
+        const modal = new Web3Modal({
+          cacheProvider: true, // Persist user's wallet choice
+          providerOptions: options, // Your wallet provider options
+        });
+    
+        // Connect wallet using Web3Modal
+        const instance = await modal.connect();
+        const web3Provider = new ethers.BrowserProvider(instance);
+        const signer = await web3Provider.getSigner();
+        const address = await signer.getAddress();
+    
+        // Update store with provider and wallet address
+        set({ provider: web3Provider, walletAddress: address });
+    
+        // Create contract instance with signer
+        const newContract = new ethers.Contract(
+          process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+          CONTRACT_ABI['abi'], // Ensure you have the correct ABI
+          signer
+        );// Attempt to connect wallet and set contract
+        set({ contract: newContract });
+    
+      }
+      
+      const{contract:updatedContract} = get(); // Get the updated updatedContract after wallet connection
+      console.log('Connected to updatedContract:', updatedContract);
+    
+      // Check if the updatedContract is still null after connectWallet
+      if (!updatedContract) {
+        console.error('Contract still not available after connecting wallet.');
+        return;
+      }
+    
+      // Check if the method is available on the updatedContract
+      if (typeof updatedContract[methodName] !== 'function') {
+        console.error(`Method ${methodName} is not available on the updatedContract.`);
+        return;
+      }
+    
+      try {
+        const result = await updatedContract[methodName](...params);
+        console.log('Read-only function result:', result);
+        return result;
+      } catch (error) {
+        console.error('Error calling read-only function:', error);
+      }
+    },
+    // Disconnect wallet
+    disconnectWallet: () => {
+      // Clear localStorage
+      localStorage.removeItem('walletAddress');
+      localStorage.removeItem('contractAddress');
+
+      // Reset store state
+      set({
+        provider: null,
+        contract: null,
+        walletAddress: null,
+        error: null,
       });
-
-      const instance = await modal.connect();
-      const web3Provider = new ethers.BrowserProvider(instance);
-      const signer = await web3Provider.getSigner();
-      const address = await signer.getAddress();
-
-      // Update store state
-      set({ provider: web3Provider, walletAddress: address });
-      const contract = new ethers.Contract(get().CONTRACT_ADDRESS, get().CONTRACT_ABI, signer);
-      set({ contract });
-
-      // Save to localStorage
-      localStorage.setItem('walletAddress', address);
-      localStorage.setItem('contractAddress', get().CONTRACT_ADDRESS);
-
-      console.log({ contract, address });
-    } catch (error) {
-      console.error("Error connecting wallet:", error);
-      set({ error: "Failed to connect wallet. Please try again." });
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  disconnectWallet: () => {
-    // Clear localStorage
-    localStorage.removeItem('walletAddress');
-    localStorage.removeItem('contractAddress');
-
-    // Reset store state
-    set({
-      provider: null,
-      contract: null,
-      walletAddress: '',
-      error: null,
-    });
-  },
-
-  // Setter for contract
-  setContract: (contract) => {
-    set({ contract });
-  },
-  setProvider: (provider) => {
-    set({ provider });
-  },
-
-  setWalletAddress: (walletAddress) => {
-    set({ walletAddress });
-  },
-  
-}));
-
-// export default useWalletStore;
+    },
+  };
+});

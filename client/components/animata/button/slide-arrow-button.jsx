@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { CreateCampaign } from "@/components/ContributorList";
+import { useRouter } from "next/navigation";
+
 
 export default function SlideArrowButton({
   text = "Get Started",
@@ -10,13 +12,17 @@ export default function SlideArrowButton({
   ...props
 }) {
   
+  const { router } = useRouter();
 
+  const handleClick =()=>{
+    router("/create-campaign");
+  }
   return (
     <>
       <button
         className={`group relative rounded-full border border-white bg-white p-2 text-xl font-semibold ${className}`}
         {...props}
-        
+        onClick={handleClick}
       >
         <div
           className="absolute bg-orange-600 left-0 top-0 flex h-full w-11 items-center justify-end rounded-full transition-all duration-200 ease-in-out group-hover:w-full"

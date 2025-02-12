@@ -1,13 +1,17 @@
 "use client";
 import { UploadCloud } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import axios from "axios";
 import { createCampaign } from "@/lib/crowdFunding";
 import DatePicker from "@/components/DatePicker";
+import { useWalletStore } from "@/store/wallet-store";
 
 
 export default function CampaignForm() {
+  const {callTransactionFunction} = useWalletStore();
+
+  
   const [campaignName, setCampaignName] = useState("");
   const [campaignDescription, setCampaignDescription] = useState("");
   const [campaignTarget, setCampaignTarget] = useState("");
@@ -79,12 +83,12 @@ export default function CampaignForm() {
         const ipfsHash = await uploadImageToIPFS(campaignImage); // Upload the image to IPFS
         console.log("Image uploaded to IPFS with hash:", ipfsHash);
 
-        // After uploading, reset the form
-        setCampaignName("");
-        setCampaignDescription("");
-        setCampaignTarget("");
-        setCampaignImage(null);
-        setImagePreview(null);
+        // // After uploading, reset the form
+        // setCampaignName("");
+        // setCampaignDescription("");
+        // setCampaignTarget("");
+        // setCampaignImage(null);
+        // setImagePreview(null);
 
         // Log the form data with IPFS hash (you can use it to store in your backend or database)
         console.log({
@@ -97,6 +101,8 @@ export default function CampaignForm() {
 
 
         await handleCreateCampaign(campaignName, campaignDescription, campaignTarget, duration, ipfsHash,)
+
+      
       } catch (err) {
         console.error("Error uploading to IPFS:", err);
         setErrors((prevErrors) => ({
@@ -132,7 +138,8 @@ export default function CampaignForm() {
     // Create new campaign
     const handleCreateCampaign = async (name, description, goal, duration, image) => {
       try {
-        await createCampaign(name, description, parseInt(goal), parseInt(duration), image);
+          const txReceipt = await callTransactionFunction('createCampaign', name, description, parseInt(goal), parseInt(duration), image); // Replace with your function and params
+        console.log('Transaction receipt:', txReceipt);
       } catch (error) {
         console.error("Error creating campaign:", error);
       }

@@ -1,9 +1,15 @@
 'use client'
 import { ContributorList } from "@/components/ContributorList";
+import Deadline from "@/components/Deadline";
 import { ReFund } from "@/components/ForRefund";
-import { useState } from "react";
+import { useWalletStore } from "@/store/wallet-store";
+import { useEffect, useState } from "react";
 
 export default function CampaignSingle() {
+    const { connectWallet, callReadOnlyFunction, contract, walletAddress } = useWalletStore();
+  
+
+  // const  {campaignsId} = params;
     const dummyData = {
       id: "0x1234567890abcdef1234567890abcdef12345678",
       name: "Help Save the Forests",
@@ -17,10 +23,12 @@ export default function CampaignSingle() {
       ETHPrice: "3000", // $ per ETH
     };
     
+
     const [amountInUSD, setAmountInUSD] = useState();
     const [isDialogOpenForRefund, setIsDialogOpenForRefund] = useState(false);
     const [isDialogOpenForWithdrawal, setIsDialogOpenForWithdrawal] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [campaign, setCampaign] = useState();
    
     const handleSubmit = (event) => {
       event.preventDefault();
@@ -45,6 +53,40 @@ export default function CampaignSingle() {
   const ForRefund = () => {
     setIsDialogOpenForRefund(true);
   };
+
+  function formatCampaignData(campaign) {
+    return {
+      creator: campaign.creator,
+      goal: parseInt(campaign.goal), // Convert BigNumber to number
+      deadline: new Date(parseInt(campaign.deadline) * 1000).toLocaleString(), // Format timestamp to date
+      totalFunds: parseInt(campaign.totalFunds), // Convert BigNumber to number
+      description: campaign.description,
+      imageUrl: campaign.imageUrl,
+      name: campaign.name,
+      goalReached: campaign.goalReached,
+      isClosed: campaign.isClosed,
+      donations: campaign.donations.map(donation => parseInt(donation)), // Convert BigNumber array
+      donors: campaign.donors,
+    };
+  }
+
+
+  useEffect(()=>{
+    const fetchContractData = async () => {
+    
+   
+      const data = await callReadOnlyFunction('getCampaignByIndex', 0);
+      const campaignDetails = formatCampaignData(data) 
+      setCampaign(campaignDetails) // Replace with your method name and params
+    
+     
+    
+  };
+
+  fetchContractData()
+  },[])
+
+  console.log(campaign)
   
     return (
       <div>
@@ -53,8 +95,8 @@ export default function CampaignSingle() {
           <div className="max-w-[90rem] mx-auto py-6 px-4">
             <div className="flex flex-col md:flex-row  gap-6 md:gap-28">
               <div className="flex-1  space-y-4 ">
-                <h1 className="text-4xl font-bold">{dummyData.name}</h1>
-                <p className="text-lg text-gray-600 dark:text-gray-400">{dummyData.description}</p>
+                <h1 className="text-4xl font-bold">{campaign?.name}</h1>
+                <p className="text-lg text-gray-600 dark:text-gray-400">{campaign?.description}</p>
                 <a href={`https://rinkeby.etherscan.io/address/${dummyData.id}`} className="text-orange-600 hover:text-orange-700">
                   View on Rinkeby Etherscan
                 </a>
@@ -66,15 +108,17 @@ export default function CampaignSingle() {
                     </div>
                     <div className="border border-gray-600 shadow-lg rounded-lg p-5">
                       <h3 className="font-semibold">Wallet Address of Campaign Creator</h3>
-                      <p>{dummyData.manager}</p>
+                      <p>{campaign?.creator}</p>
                     </div>
                     <div className="border border-gray-600 shadow-md rounded-md p-5">
-                      <h3 className="font-semibold">Number of Requests</h3>
-                      <p>{dummyData.requestsCount}</p>
+                      <h3 className="font-semibold">Number of Backers</h3>
+                      <p>{campaign?.donors.length}</p>
                     </div>
                     <div className="border border-gray-600 shadow-md rounded-md p-5">
-                      <h3 className="font-semibold">Number of Approvers</h3>
-                      <p>{dummyData.approversCount}</p>
+                      <h3 className="font-semibold">Campaign Deadline</h3>
+                      <p><Deadline targetDate="13/02/2025, 00:00:15"/></p>
+                      {/* <p><Deadline targetDate="2025-02-13T00:00:15"/></p> */}
+
                     </div>
                   </div>
                 </div>

@@ -109,7 +109,7 @@ export const FooterSection = () => {
               href="https://github.com/leoMirandaa"
               className="text-primary transition-all border-primary hover:border-b-2 ml-1"
             >
-              Leo Miranda
+             Achimugu A S
             </Link>
           </h3>
         </section>

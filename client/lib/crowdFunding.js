@@ -1,18 +1,21 @@
+'use client';
 import {useWalletStore} from "@/store/wallet-store";
 import { ethers } from "ethers";
 
 // Function to get the contract from the zustand store
-const getContract = () => {
-  const { provider, contract, CONTRACT_ADDRESS, CONTRACT_ABI, setContract , walletAddress} = useWalletStore.getState();
-// console.log({provider, contract, CONTRACT_ADDRESS, CONTRACT_ABI,walletAddress})
-//   // Recreate the contract instance if it doesn't exist but the provider is available
-//   if (!contract && provider) {
-//     const signer = provider.getSigner();
-//     const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-//     console.log({contractInstance})
-//     setContract(contractInstance); // Save contract in zustand store
-//     return contractInstance;
-//   }
+const getContract = async() => {
+  const { provider, initialize, contract, CONTRACT_ADDRESS, CONTRACT_ABI, setContract , walletAddress} = useWalletStore.getState();
+//  await  initialize()
+console.log({"this":'jjf', provider, contract, CONTRACT_ADDRESS, CONTRACT_ABI,walletAddress})
+
+  // Recreate the contract instance if it doesn't exist but the provider is available
+  // if (!contract && provider) {
+  //   const signer = provider.getSigner();
+  //   const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+  //   console.log({contractInstance})
+  //   setContract(contractInstance); // Save contract in zustand store
+  //   return contractInstance;
+  // }
 
   return contract;
 };
@@ -26,7 +29,6 @@ export const createCampaign = async (name, description, goal, duration, image) =
     console.log("Campaign created successfully!");
   } catch (error) {
     console.error("Error creating campaign:", error);
-    throw new Error("Failed to create campaign. Please try again.");
   }
 };
 
@@ -39,7 +41,6 @@ export const contribute = async (campaignId, amount) => {
     console.log("Contribution made successfully!");
   } catch (error) {
     console.error("Error contributing:", error);
-    throw new Error("Failed to contribute. Please try again.");
   }
 };
 
@@ -52,7 +53,6 @@ export const claimRefund = async (campaignId) => {
     console.log("Refund claimed successfully!");
   } catch (error) {
     console.error("Error claiming refund:", error);
-    throw new Error("Failed to claim refund. Please try again.");
   }
 };
 
@@ -65,7 +65,6 @@ export const withdrawFunds = async (campaignId) => {
     console.log("Funds withdrawn successfully!");
   } catch (error) {
     console.error("Error withdrawing funds:", error);
-    throw new Error("Failed to withdraw funds. Please try again.");
   }
 };
 
@@ -77,7 +76,6 @@ export const getCampaignProgress = async (campaignId) => {
     return { totalFunds: ethers.utils.formatEther(totalFunds), percentage };
   } catch (error) {
     console.error("Error getting campaign progress:", error);
-    throw new Error("Failed to fetch campaign progress. Please try again.");
   }
 };
 
@@ -86,12 +84,15 @@ export const getAllCampaigns = async () => {
   const contract = getContract();
   try {
     const campaigns = await contract.getAllCampaigns();
+    console.log({ "Campaigns fetched successfully!": campaigns });
     return campaigns;
   } catch (error) {
     console.error("Error fetching campaigns:", error);
-    throw new Error("Failed to fetch campaigns. Please try again.");
+    return null; // Return null to indicate an error
   }
 };
+
+
 
 // Get paginated campaigns
 export const getPaginatedCampaigns = async (offset, limit) => {

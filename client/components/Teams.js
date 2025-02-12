@@ -10,7 +10,8 @@ import { getAllCampaigns } from "@/lib/crowdFunding";
 import {useWalletStore} from "@/store/wallet-store";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import CampaignCards from "./CampaignCards";
 
 const socialIcon = (socialName) => {
   switch (socialName) {
@@ -26,167 +27,80 @@ const socialIcon = (socialName) => {
 };
 
 export const TeamSection = () => {
-        const {  contract } = useWalletStore();
-  // const [loading, setLoading] = useState(false);
-  // useEffect(() => {
-  //   reinitializeWallet(); // Reconnect wallet on app load
-  // }, [reinitializeWallet])
 
-  useEffect(() => {
+
+
+  const { connectWallet, callReadOnlyFunction, contract, walletAddress } = useWalletStore();
+  const [allCampaigns, setAllCampaigns] = useState([]);
+
+  const fetchContractData = async () => {
     
-    // Define an async function inside useEffect
-    const fetchCampaigns = async () => {
-      
-      try {
-        console.log({"this is a ":contract})
-        // await connectWallet(setLoading)
-        const allCampaigns = await getAllCampaigns();
-        console.log("All campaigns:", allCampaigns);
-      } catch (error) {
-        console.log("Error fetching all campaigns:", error);
-      }
-    };
+   
+      // const data = await callReadOnlyFunction('getPaginatedCampaigns', 0,8); // Replace with your method name and params
+      const [data, currentPage, totalPages, totalCampaigns] = await callReadOnlyFunction('getPaginatedCampaigns', 0,8); // Replace with your method name and params
+      console.log("Total Campaigns:", totalCampaigns); // Convert BigNumber to number
+      console.log("Current Page:", currentPage);
+      console.log("Total Pages:", totalPages);
+      console.log('Contract data:', data);
+      const formattedData = await getFormattedCampaigns(data);
+      setAllCampaigns(formattedData);
+      console.log('All campaigns:', allCampaigns);
+    
+  };
+
+
+
+  async function getFormattedCampaigns(data) {
+    const campaignCount = await data.length;  // Get number of campaigns
+    const campaigns = [];
   
-    // Call the async function
-    fetchCampaigns();
-  }, []);
-
+    // Iterate over the campaign count and fetch data
+    for (let i = 0; i < campaignCount; i++) {
+      const campaign = data[i]  // Fetch each campaign's details
+  
+      // Use map() to format the campaign data
+      const formattedCampaign = {
+        index: i + 1,  // Adding 1 to index for display purposes
+        creator: campaign.creator,
+        goal: campaign.goal.toString(),  // Convert BigInt to string
+        deadline: new Date(parseInt(campaign.deadline) * 1000).toLocaleString(),  // Convert timestamp
+        imageUrl: campaign.imageUrl,
+        totalFunds: parseInt(campaign.totalFunds),  // Convert BigInt to string
+        description: campaign.description,
+        name: campaign.name,
+        goalReached: campaign.goalReached,
+        isClosed: campaign.isClosed,
+        donors: campaign.donors.length,  // Number of donors
+        donations: campaign.donations.reduce((total, amount) => total + amount, 0).toString(),  // Sum of donations
+      };
+  
+      // console.log('Formatted campaign:', formattedCampaign);
+      campaigns.push(formattedCampaign);  // Add formatted data to the campaigns array
+    }
+    // console.log('All campaigns:', campaigns);  // Log the final array of formatted campaigns for testing purposes
+  
+    return campaigns;  // Return the array of formatted campaigns
+  }
+  
   
 
 
-  const teamList = [
-    {
-      imageUrl: "/image",
-      firstName: "Leo",
-      lastName: "Miranda",
-      positions: ["Vue Fronted Developer", "Creator Of This Website"],
-      socialNetworks: [
-        { name: "LinkedIn", url: "https://www.linkedin.com/in/leopoldo-miranda/" },
-        { name: "Github", url: "https://github.com/leoMirandaa" },
-        { name: "X", url: "https://x.com/leo_mirand4" },
-      ],
-    },
-    {
-        imageUrl: "/image",
-        firstName: "Leo",
-        lastName: "Miranda",
-        positions: ["Vue Fronted Developer", "Creator Of This Website"],
-        socialNetworks: [
-          { name: "LinkedIn", url: "https://www.linkedin.com/in/leopoldo-miranda/" },
-          { name: "Github", url: "https://github.com/leoMirandaa" },
-          { name: "X", url: "https://x.com/leo_mirand4" },
-        ],
-      },
-      {
-        imageUrl: "/image",
-        firstName: "Leo",
-        lastName: "Miranda",
-        positions: ["Vue Fronted Developer", "Creator Of This Website"],
-        socialNetworks: [
-          { name: "LinkedIn", url: "https://www.linkedin.com/in/leopoldo-miranda/" },
-          { name: "Github", url: "https://github.com/leoMirandaa" },
-          { name: "X", url: "https://x.com/leo_mirand4" },
-        ],
-      },
-      {
-        imageUrl: "/image",
-        firstName: "Leo",
-        lastName: "Miranda",
-        positions: ["Vue Fronted Developer", "Creator Of This Website"],
-        socialNetworks: [
-          { name: "LinkedIn", url: "https://www.linkedin.com/in/leopoldo-miranda/" },
-          { name: "Github", url: "https://github.com/leoMirandaa" },
-          { name: "X", url: "https://x.com/leo_mirand4" },
-        ],
-      },
-      {
-        imageUrl: "/image",
-        firstName: "Leo",
-        lastName: "Miranda",
-        positions: ["Vue Fronted Developer", "Creator Of This Website"],
-        socialNetworks: [
-          { name: "LinkedIn", url: "https://www.linkedin.com/in/leopoldo-miranda/" },
-          { name: "Github", url: "https://github.com/leoMirandaa" },
-          { name: "X", url: "https://x.com/leo_mirand4" },
-        ],
-      },
-      {
-        imageUrl: "/image",
-        firstName: "Leo",
-        lastName: "Miranda",
-        positions: ["Vue Fronted Developer", "Creator Of This Website"],
-        socialNetworks: [
-          { name: "LinkedIn", url: "https://www.linkedin.com/in/leopoldo-miranda/" },
-          { name: "Github", url: "https://github.com/leoMirandaa" },
-          { name: "X", url: "https://x.com/leo_mirand4" },
-        ],
-      },
-      {
-        imageUrl: "/image",
-        firstName: "Leo",
-        lastName: "Miranda",
-        positions: ["Vue Fronted Developer", "Creator Of This Website"],
-        socialNetworks: [
-          { name: "LinkedIn", url: "https://www.linkedin.com/in/leopoldo-miranda/" },
-          { name: "Github", url: "https://github.com/leoMirandaa" },
-          { name: "X", url: "https://x.com/leo_mirand4" },
-        ],
-      },
-      {
-        imageUrl: "/image",
-        firstName: "Leo",
-        lastName: "Miranda",
-        positions: ["Vue Fronted Developer", "Creator Of This Website"],
-        socialNetworks: [
-          { name: "LinkedIn", url: "https://www.linkedin.com/in/leopoldo-miranda/" },
-          { name: "Github", url: "https://github.com/leoMirandaa" },
-          { name: "X", url: "https://x.com/leo_mirand4" },
-        ],
-      },
-    // Other team members...
-  ];
+ 
 
   return (
     <section id="team" className="container lg:w-[75%] py-24 sm:py-32 mx-auto">
+      <div>
+      <button onClick={fetchContractData}>Fetch Contract Data</button>
+      {walletAddress && <p>Wallet Address: {walletAddress}</p>}
+    </div>
       <div className="text-center mb-8">
         <h2 className="text-lg text-primary text-center mb-2 tracking-wider">Team</h2>
         <h2 className="text-3xl md:text-4xl text-center font-bold">The Company Dream Team</h2>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-        {teamList.map(({ imageUrl, firstName, lastName, positions, socialNetworks }, index) => (
-          <Card key={index} className="bg-muted/60 dark:bg-card flex flex-col h-full overflow-hidden group/hoverimg">
-            <CardHeader className="p-0 gap-0">
-              <div className="h-full overflow-hidden">
-                <Image
-                  src={imageUrl}
-                  alt={`${firstName} ${lastName} profile`}
-                  width={300}
-                  height={300}
-                  className="w-full aspect-square object-cover saturate-0 transition-all duration-200 ease-linear size-full group-hover/hoverimg:saturate-100 group-hover/hoverimg:scale-[1.01]"
-                />
-              </div>
-              <CardTitle className="py-6 pb-4 px-6">
-                {firstName} <span className="text-primary ml-2">{lastName}</span>
-              </CardTitle>
-            </CardHeader>
+     
+        <CampaignCards campaigns={allCampaigns} />
 
-            {positions.map((position, index) => (
-              <CardContent key={index} className={`pb-0 text-muted-foreground ${index === positions.length - 1 && "pb-6"}`}>
-                {position}{index < positions.length - 1 && <span>,</span>}
-              </CardContent>
-            ))}
-
-            <CardFooter className="space-x-4 mt-auto">
-              {/* {socialNetworks.map(({ name, url }, index) => (
-                <Link key={index} href={url} target="_blank" className="hover:opacity-80 transition-all">
-                  {socialIcon(name)}
-                </Link>
-              ))} */}
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
     </section>
   );
 };

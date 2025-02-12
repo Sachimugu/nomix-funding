@@ -96,8 +96,9 @@ const ConnectButton = () => {
     await connectWallet(setLoading)
   }
 
-  const  handleDisconnectWalletAddr= () => {
-    disconnectWallet(); // Reset the global state
+  const  handleDisconnectWalletAddr= async () => {
+    console.log("Disconnecting wallet...");
+    await disconnectWallet(); // Reset the global state
   };
 
   return (
