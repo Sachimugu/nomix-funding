@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 function Deadline({ targetDate }) {
+  console.log({targetDate})
 
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(targetDate));
 

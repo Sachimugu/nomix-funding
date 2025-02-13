@@ -75,20 +75,22 @@ contract CrowdFunding {
     }
 
     // Function to contribute to a campaign
-    function contribute(uint256 campaignId) public payable isActive(campaignId) {
-        require(msg.value > 0, "Contribution must be greater than 0");
+   function contribute(uint256 campaignId, uint256 amount) public payable isActive(campaignId) {
+    require(amount > 0, "Contribution must be greater than 0");
+    require(msg.value == amount, "Sent value does not match the specified amount");
 
-        Campaign storage campaign = campaigns[campaignId];
-        campaign.totalFunds += msg.value;
-        campaign.donations.push(msg.value);
-        campaign.donors.push(msg.sender);
-        emit DonationMade(campaignId, msg.sender, msg.value);
+    Campaign storage campaign = campaigns[campaignId];
+    campaign.totalFunds += amount;
+    campaign.donations.push(amount);
+    campaign.donors.push(msg.sender);
+    emit DonationMade(campaignId, msg.sender, amount);
 
-        // Check if the goal has been reached
-        if (campaign.totalFunds >= campaign.goal) {
-            campaign.goalReached = true;
-        }
+    // Check if the goal has been reached
+    if (campaign.totalFunds >= campaign.goal) {
+        campaign.goalReached = true;
     }
+}
+
 
     // Function to get the campaign progress (funds raised and percentage)
     function getCampaignProgress(uint256 campaignId) public view returns (uint256, uint256) {

@@ -5,11 +5,12 @@ import { ReFund } from "@/components/ForRefund";
 import { useWalletStore } from "@/store/wallet-store";
 import { useEffect, useState } from "react";
 
-export default function CampaignSingle() {
-    const { connectWallet, callReadOnlyFunction, contract, walletAddress } = useWalletStore();
+export default function CampaignSingle ({params}) {
+    const { connectWallet, callReadOnlyFunction, callTransactionFunction,contract, walletAddress } = useWalletStore();
   
 
-  // const  {campaignsId} = params;
+    
+  
     const dummyData = {
       id: "0x1234567890abcdef1234567890abcdef12345678",
       name: "Help Save the Forests",
@@ -30,11 +31,26 @@ export default function CampaignSingle() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [campaign, setCampaign] = useState();
    
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
       event.preventDefault();
-      setIsSubmitted(true);
-      setAmountInUSD(null);
-    };
+      
+      // Assuming params already contains campaignId
+      const { campaignId } = await params; 
+  
+      // Convert USD to Ether (example rate used)
+      // const usdToEthConversionRate = 0.0005; // Replace with dynamic rate
+      // const amountInEther = amountInUSD * usdToEthConversionRate; // Convert USD to Ether
+      // const amountInWei = ethers.utils.parseUnits(amountInEther.toString(), 'ether'); // Convert Ether to Wei
+  
+      // console.log(`Contributing: ${amountInUSD} USD which equals to ${amountInEther} ETH`);
+  
+      // Call the contribute method
+      const data = await callTransactionFunction('contribute', campaignId, 10000000000,{
+        value: 10000000000
+      });
+  
+      setAmountInUSD(''); // Reset the input after the transaction
+  };
   
     const getETHPriceInUSD = (ETHPrice, amountInETH) => {
       return (ETHPrice * amountInETH).toFixed(2);
@@ -72,10 +88,12 @@ export default function CampaignSingle() {
 
 
   useEffect(()=>{
+    
     const fetchContractData = async () => {
+      const  {campaignId}= await params;
     
    
-      const data = await callReadOnlyFunction('getCampaignByIndex', 0);
+      const data = await callReadOnlyFunction('getCampaignByIndex', campaignId);
       const campaignDetails = formatCampaignData(data) 
       setCampaign(campaignDetails) // Replace with your method name and params
     
@@ -116,7 +134,13 @@ export default function CampaignSingle() {
                     </div>
                     <div className="border border-gray-600 shadow-md rounded-md p-5">
                       <h3 className="font-semibold">Campaign Deadline</h3>
-                      <p><Deadline targetDate="13/02/2025, 00:00:15"/></p>
+                      {/* <p><Deadline targetDate="14/02/2025, 00:00:15"/></p> */}
+                      {/* <p><Deadline targetDate={campaign?.deadline.toString()}/></p> */}
+                      <p><Deadline targetDate={campaign?.deadline ? campaign.deadline : '13/02/2025, 00:00:15'}/></p>
+                      {/* <p><Deadline targetDate={new Date(campaign?.deadline).toString()}/></p> */}
+
+
+                  
                       {/* <p><Deadline targetDate="2025-02-13T00:00:15"/></p> */}
 
                     </div>
