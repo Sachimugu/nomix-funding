@@ -136,19 +136,32 @@ contract CrowdFunding {
     }
 
     // Function for the creator to withdraw funds after the goal is reached
-    function withdrawFunds(uint256 campaignId) public isCreator(campaignId) {
-        Campaign storage campaign = campaigns[campaignId];
-        require(campaign.goalReached, "Goal not reached");
-        require(!campaign.isClosed, "Campaign is closed");
+   function withdrawFunds(uint256 campaignId) public isCreator(campaignId) {
+    Campaign storage campaign = campaigns[campaignId];
+    
+    // Check if the goal has been reached and if the campaign is not closed
+    require(campaign.goalReached, "Goal not reached");
+    require(!campaign.isClosed, "Campaign is closed");
 
-        campaign.isClosed = true;
-        uint256 amount = campaign.totalFunds;
-        campaign.totalFunds = 0;
+    // Mark the campaign as closed
+    campaign.isClosed = true;
 
-        (bool success, ) = payable(campaign.creator).call{value: amount}("");
-        require(success, "Failed to send Ether");
-        emit FundsWithdrawn(campaignId, campaign.creator, amount);
-    }
+    // Store the total amount to be withdrawn
+    uint256 amount = campaign.totalFunds;
+
+    // Reset totalFunds to zero
+    campaign.totalFunds = 0;
+
+    // Reset the campaign deadline to 0 after the funds are withdrawn
+    campaign.deadline = 0;
+
+    // Attempt to send Ether to the campaign creator
+    (bool success, ) = payable(campaign.creator).call{value: amount}("");
+    require(success, "Failed to send Ether");
+
+    // Emit the FundsWithdrawn event
+    emit FundsWithdrawn(campaignId, campaign.creator, amount);
+}
 
     // Function to get all campaigns
     function getAllCampaigns() public view returns (Campaign[] memory) {

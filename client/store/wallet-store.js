@@ -3,6 +3,7 @@ import CONTRACT_ABI from '@/lib/abi';
 import { create } from 'zustand';
 import Web3Modal from 'web3modal';
 import { ethers } from 'ethers';
+import { handleError } from '@/lib/Errormsg';
 
 // Provider options for Web3Modal
 export const options = {
@@ -162,9 +163,11 @@ export const useWalletStore = create((set, get) => {
         const receipt = await tx.wait();
         console.log(`Transaction mined: ${receipt.transactionHash}`);
 
-        return receipt; // Return the transaction receipt
+        return {success:true, msg:receipt}; // Return the transaction receipt
       } catch (error) {
-        console.error('Error calling transaction function:', error);
+        const errorMessage = handleError(error);
+        // console.error('Error calling transaction function:', errorMessage);
+        return {success:false, msg:errorMessage}; // Return the error message
       }
     },
 

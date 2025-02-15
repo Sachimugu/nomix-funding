@@ -26,7 +26,27 @@ const fakeContributors = [
 ];
 
 
-export function ContributorList({ isDialogOpen, setIsDialogOpen }) {
+function createDonationArray(amounts, identifiers) {
+  if(amounts){
+
+    if (amounts.length !== identifiers.length) {
+      throw new Error("The lengths of the amounts and identifiers arrays must match.");
+    }
+  
+    // Map over the arrays to return an array of objects
+    const result = amounts.map((amount, index) => ({
+      wallet: identifiers[index],  // Get the donor at the same index
+      amount: `${amount} ETH`,      // Format the amount as ETH
+    }));
+    return result;
+  }
+  // Check if both arrays are the same length
+
+}
+export function ContributorList({ isDialogOpen, setIsDialogOpen, wallets, amounts}) {
+
+
+   const  Contributors = createDonationArray(amounts, wallets)
   return (
     <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <AlertDialogContent>
@@ -44,7 +64,7 @@ export function ContributorList({ isDialogOpen, setIsDialogOpen }) {
                   </tr>
                 </thead>
                 <tbody className="">
-                  {fakeContributors.map((contributor, index) => (
+                  {Contributors?.map((contributor, index) => (
                     <tr key={index}>
                       <th>{index + 1}</th>
                       <td className=" ">{contributor.wallet.slice(0,20)}...</td>

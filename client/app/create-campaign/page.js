@@ -1,5 +1,5 @@
 "use client";
-import { UploadCloud } from "lucide-react";
+import { Loader, UploadCloud } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import axios from "axios";
@@ -11,7 +11,7 @@ import { useWalletStore } from "@/store/wallet-store";
 export default function CampaignForm() {
   const {callTransactionFunction} = useWalletStore();
 
-  
+  const [isLoading, setIsLoading] = useState(false);
   const [campaignName, setCampaignName] = useState("");
   const [campaignDescription, setCampaignDescription] = useState("");
   const [campaignTarget, setCampaignTarget] = useState("");
@@ -79,6 +79,8 @@ export default function CampaignForm() {
     setErrors(formErrors);
 
     if (isValid) {
+    setIsLoading(true)
+
       try {
         const ipfsHash = await uploadImageToIPFS(campaignImage); // Upload the image to IPFS
         console.log("Image uploaded to IPFS with hash:", ipfsHash);
@@ -102,9 +104,12 @@ export default function CampaignForm() {
 
         await handleCreateCampaign(campaignName, campaignDescription, campaignTarget, duration, ipfsHash,)
 
+    setIsLoading(false)
       
       } catch (err) {
         console.error("Error uploading to IPFS:", err);
+    setIsLoading(false)
+
         setErrors((prevErrors) => ({
           ...prevErrors,
           image: "Error uploading image to IPFS.",
@@ -237,7 +242,7 @@ export default function CampaignForm() {
             type="submit"
             className="w-full bg-orange-600 text-white py-3 rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
           >
-            Create Campaign
+           {isLoading? <Loader className="text-white animate-spin mx-auto" size={34} />: 'Create Campaign'} 
           </button>
         </div>
       </form>

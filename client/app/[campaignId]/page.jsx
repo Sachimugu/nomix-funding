@@ -1,7 +1,8 @@
 'use client'
 import { ContributorList } from "@/components/ContributorList";
 import Deadline from "@/components/Deadline";
-import { ReFund } from "@/components/ForRefund";
+import ReFund from "@/components/ForRefund";
+import WithdrawFunds from "@/components/WithdrawFunds";
 import { useWalletStore } from "@/store/wallet-store";
 import { useEffect, useState } from "react";
 
@@ -67,6 +68,7 @@ export default function CampaignSingle ({params}) {
   };
 
   const ForRefund = () => {
+    console.log('ForRefund0000000'); //
     setIsDialogOpenForRefund(true);
   };
 
@@ -83,6 +85,7 @@ export default function CampaignSingle ({params}) {
       isClosed: campaign.isClosed,
       donations: campaign.donations.map(donation => parseInt(donation)), // Convert BigNumber array
       donors: campaign.donors,
+      
     };
   }
 
@@ -102,7 +105,7 @@ export default function CampaignSingle ({params}) {
   };
 
   fetchContractData()
-  },[])
+  },[amountInUSD])
 
   console.log(campaign)
   
@@ -152,7 +155,9 @@ export default function CampaignSingle ({params}) {
                 <div className="dark:border-[1px] dark:border-gray-500  shadow-2xl rounded-lg p-6">
                   <h3 className="font-semibold">Campaign Balance</h3>
                   <div className="text-2xl font-bold">
-                    {dummyData.balance} ETH (~${getETHPriceInUSD(dummyData.ETHPrice, dummyData.balance)} USD)
+                  {Math.round(campaign?.totalFunds/1800000000)} ETH (~${Math.round((campaign?.totalFunds/1800000000) * 1505)   }USD)
+                    
+
                   </div>
                   <p>Target: {dummyData.target} ETH (~${getETHPriceInUSD(dummyData.ETHPrice, dummyData.target)} USD)</p>
                   <div className="w-full bg-gray-200 h-2 mt-4 rounded">
@@ -212,21 +217,21 @@ export default function CampaignSingle ({params}) {
                   </p>
                   <div>
 
-                  <div  onClick={ForWithdrawal} href={`https://rinkeby.etherscan.io/address/${dummyData.id}`} className="text-orange-600 hover:text-orange-700">
+                  <div  onClick={ForWithdrawal} className="text-orange-600 cursor-pointer hover:underline">
                   Withdrawal Funds
                 </div>
-                  </div>
-                <div  onclick={ForRefund} href={`https://rinkeby.etherscan.io/address/${dummyData.id}`} className="text-orange-600 hover:text-orange-700">
+                <div  onClick={ForRefund} className="text-orange-600 cursor-pointer hover:underline">
                   Request Refund
                 </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      <ContributorList isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen} />
-      <ReFund isDialogOpenForWithdrawal={isDialogOpenForWithdrawal} setIsDialogOpenForWithdrawal={isDialogOpenForWithdrawal} />
-      <ContributorList isDialogOpenForRefund={isDialogOpenForRefund } setIsDialogOpenForRefund={setIsDialogOpenForRefund} />
+      <ContributorList isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}  amounts={campaign?.donations} wallets={campaign?.donors}/>
+      <WithdrawFunds isDialogOpenForWithdrawal={isDialogOpenForWithdrawal} setIsDialogOpenForWithdrawal={setIsDialogOpenForWithdrawal} />
+      <ReFund isDialogOpenForRefund={isDialogOpenForRefund } setIsDialogOpenForRefund={setIsDialogOpenForRefund} />
 
       </div>
     );

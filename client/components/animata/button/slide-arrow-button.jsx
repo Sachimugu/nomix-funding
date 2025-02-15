@@ -12,10 +12,10 @@ export default function SlideArrowButton({
   ...props
 }) {
   
-  const { router } = useRouter();
-
-  const handleClick =()=>{
-    router("/create-campaign");
+  const router  = useRouter();
+  
+  const handleClick = async()=>{
+    router.push("/create-campaign");
   }
   return (
     <>
