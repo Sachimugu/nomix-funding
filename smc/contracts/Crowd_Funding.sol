@@ -92,13 +92,6 @@ contract CrowdFunding {
 }
 
 
-    // Function to get the campaign progress (funds raised and percentage)
-    function getCampaignProgress(uint256 campaignId) public view returns (uint256, uint256) {
-        require(campaignId < campaigns.length, "Campaign does not exist");
-        Campaign memory campaign = campaigns[campaignId];
-        uint256 percentage = (campaign.totalFunds * 100) / campaign.goal;
-        return (campaign.totalFunds, percentage);
-    }
 
     // Function to allow users to claim refunds if the goal wasn't met
     function claimRefund(uint256 campaignId) public {
@@ -163,70 +156,82 @@ contract CrowdFunding {
     emit FundsWithdrawn(campaignId, campaign.creator, amount);
 }
 
-    // Function to get all campaigns
-    function getAllCampaigns() public view returns (Campaign[] memory) {
-        return campaigns;
+  
+
+// Function to return paginated campaigns sorted by deadline (ending soonest first)
+function getPaginatedCampaigns(uint256 offset, uint256 limit) 
+    public 
+    view 
+    returns (
+        Campaign[] memory paginatedCampaigns, 
+        uint256 currentPage, 
+        uint256 totalPages, 
+        uint256 totalCampaigns
+    ) 
+{
+    uint256 activeCampaignCount = 0;
+
+    // Count the active campaigns
+    for (uint256 i = 0; i < campaigns.length; i++) {
+        Campaign storage campaign = campaigns[i];
+        if (!campaign.isClosed && block.timestamp < campaign.deadline) {
+            activeCampaignCount++;
+        }
     }
 
-    // // Function to get paginated campaigns
-    // function getPaginatedCampaigns(uint256 offset, uint256 limit) public view returns (Campaign[] memory) {
-    //     require(offset < campaigns.length, "Offset out of bounds");
+    require(offset < activeCampaignCount, "Offset out of bounds");
 
-    //     uint256 end = offset + limit;
-    //     if (end > campaigns.length) {
-    //         end = campaigns.length;
-    //     }
+    // Calculate total active campaigns
+    totalCampaigns = activeCampaignCount;
 
-    //     Campaign[] memory paginatedCampaigns = new Campaign[](end - offset);
-    //     for (uint256 i = offset; i < end; i++) {
-    //         paginatedCampaigns[i - offset] = campaigns[i];
-    //     }
-
-    //     return paginatedCampaigns;
-    // }
-
-
-// Function to return paginated campaigns with pagination metadata
-    function getPaginatedCampaigns(uint256 offset, uint256 limit) 
-        public 
-        view 
-        returns (
-            Campaign[] memory paginatedCampaigns, 
-            uint256 currentPage, 
-            uint256 totalPages, 
-            uint256 totalCampaigns
-        ) 
-    {
-        require(offset < campaigns.length, "Offset out of bounds");
-
-        // Calculate total campaigns
-        totalCampaigns = campaigns.length;
-
-        // Calculate total pages
-        totalPages = totalCampaigns / limit;
-        if (totalCampaigns % limit != 0) {
-            totalPages++; // Add an extra page if there's a remainder
-        }
-
-        // Calculate current page (1-indexed for user-friendliness)
-        currentPage = (offset / limit) + 1;
-
-        // Calculate the end index of the pagination
-        uint256 end = offset + limit;
-        if (end > totalCampaigns) {
-            end = totalCampaigns;
-        }
-
-        // Prepare the paginated campaigns array
-        paginatedCampaigns = new Campaign[](end - offset);
-        for (uint256 i = offset; i < end; i++) {
-            paginatedCampaigns[i - offset] = campaigns[i];
-        }
-
-        // Return paginated campaigns and metadata
-        return (paginatedCampaigns, currentPage, totalPages, totalCampaigns);
+    // Calculate total pages
+    totalPages = totalCampaigns / limit;
+    if (totalCampaigns % limit != 0) {
+        totalPages++; // Add an extra page if there's a remainder
     }
-    
+
+    // Calculate current page (1-indexed for user-friendliness)
+    currentPage = (offset / limit) + 1;
+
+    // Create an array of active campaigns
+    Campaign[] memory activeCampaigns = new Campaign[](activeCampaignCount);
+    uint256 index = 0;
+    for (uint256 i = 0; i < campaigns.length; i++) {
+        Campaign storage campaign = campaigns[i];
+        if (!campaign.isClosed && block.timestamp < campaign.deadline) {
+            activeCampaigns[index] = campaign;
+            index++;
+        }
+    }
+
+    // Sort the active campaigns by deadline (earliest deadline first)
+    for (uint256 i = 0; i < activeCampaignCount; i++) {
+        for (uint256 j = i + 1; j < activeCampaignCount; j++) {
+            if (activeCampaigns[i].deadline > activeCampaigns[j].deadline) {
+                // Swap the campaigns
+                Campaign memory temp = activeCampaigns[i];
+                activeCampaigns[i] = activeCampaigns[j];
+                activeCampaigns[j] = temp;
+            }
+        }
+    }
+
+    // Calculate the end index of the pagination
+    uint256 end = offset + limit;
+    if (end > totalCampaigns) {
+        end = totalCampaigns;
+    }
+
+    // Prepare the paginated campaigns array
+    paginatedCampaigns = new Campaign[](end - offset);
+    for (uint256 i = offset; i < end; i++) {
+        paginatedCampaigns[i - offset] = activeCampaigns[i];
+    }
+
+    // Return paginated campaigns and metadata
+    return (paginatedCampaigns, currentPage, totalPages, totalCampaigns);
+}
+
 
     // Function to get donors and donations for a campaign
     function getDonorsAndDonations(uint256 campaignId) public view returns (address[] memory, uint256[] memory) {

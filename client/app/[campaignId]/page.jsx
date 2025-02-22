@@ -3,7 +3,9 @@ import { ContributorList } from "@/components/ContributorList";
 import Deadline from "@/components/Deadline";
 import ReFund from "@/components/ForRefund";
 import WithdrawFunds from "@/components/WithdrawFunds";
+import { convertUsdToWei, convertWeiToUsd, formatNumber, getEthPrice } from "@/lib/EthPrice";
 import { useWalletStore } from "@/store/wallet-store";
+import { progress } from "motion";
 import { useEffect, useState } from "react";
 
 export default function CampaignSingle ({params}) {
@@ -31,6 +33,7 @@ export default function CampaignSingle ({params}) {
     const [isDialogOpenForWithdrawal, setIsDialogOpenForWithdrawal] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [campaign, setCampaign] = useState();
+    const [ethPrice, setEthPrice] = useState();
    
     const handleSubmit = async (event) => {
       event.preventDefault();
@@ -46,8 +49,9 @@ export default function CampaignSingle ({params}) {
       // console.log(`Contributing: ${amountInUSD} USD which equals to ${amountInEther} ETH`);
   
       // Call the contribute method
-      const data = await callTransactionFunction('contribute', campaignId, 10000000000,{
-        value: 10000000000
+      const amount =await convertUsdToWei(amountInUSD)
+      const data = await callTransactionFunction('contribute', campaignId, amount,{
+        value:amount
       });
   
       setAmountInUSD(''); // Reset the input after the transaction
@@ -72,22 +76,47 @@ export default function CampaignSingle ({params}) {
     setIsDialogOpenForRefund(true);
   };
 
-  function formatCampaignData(campaign) {
-    return {
-      creator: campaign.creator,
-      goal: parseInt(campaign.goal), // Convert BigNumber to number
-      deadline: new Date(parseInt(campaign.deadline) * 1000).toLocaleString(), // Format timestamp to date
-      totalFunds: parseInt(campaign.totalFunds), // Convert BigNumber to number
-      description: campaign.description,
-      imageUrl: campaign.imageUrl,
-      name: campaign.name,
-      goalReached: campaign.goalReached,
-      isClosed: campaign.isClosed,
-      donations: campaign.donations.map(donation => parseInt(donation)), // Convert BigNumber array
-      donors: campaign.donors,
-      
-    };
-  }
+  const formatCampaignData = async (campaign) => {
+    try {
+        const totalFunds = await convertWeiToUsd(parseInt(campaign.totalFunds));
+        const goal = (formatNumber(parseFloat(campaign.goal)));
+        const formatedtf = (formatNumber(parseFloat(totalFunds)));
+        const eth = await getEthPrice()
+        
+        const ethgoal = (parseFloat(campaign.goal) / eth).toFixed(1); // Round to 1 decimal place
+        const ethtotalFunds = (parseFloat(totalFunds) / eth).toFixed(1); // Round to 1 decimal place
+        
+        console.log({totalFunds, goal})
+
+        
+        console.log({ethgoal});
+        const donations = await Promise.all(
+            campaign.donations.map(async (donation) => {
+                return await convertWeiToUsd(parseInt(donation)); // Convert BigNumber array
+            })
+        );
+
+        return {
+            creator: campaign.creator,
+            goal, // Convert BigNumber to number
+            deadline: new Date(parseInt(campaign.deadline) * 1000).toLocaleString(), // Format timestamp to date
+            totalFunds, // Convert BigNumber to number
+            description: campaign.description,
+            imageUrl: campaign.imageUrl,
+            name: campaign.name,
+            goalReached: campaign.goalReached,
+            isClosed: campaign.isClosed,
+            donations, // Wait for all donations to be converted
+            donors: campaign.donors,
+            ethgoal,
+            progress: (totalFunds/parseFloat(campaign.goal)*100),
+            formatedtf,
+            ethtotalFunds
+        };
+    } catch (error) {
+        console.error('Error formatting campaign data:', error);
+    }
+};
 
 
   useEffect(()=>{
@@ -95,9 +124,11 @@ export default function CampaignSingle ({params}) {
     const fetchContractData = async () => {
       const  {campaignId}= await params;
     
-   
+      const eth = await getEthPrice()
+      setEthPrice(eth) // Replace with your method name and params
       const data = await callReadOnlyFunction('getCampaignByIndex', campaignId);
-      const campaignDetails = formatCampaignData(data) 
+      const campaignDetails = await formatCampaignData(data) 
+      // console.log({campaignDetails})
       setCampaign(campaignDetails) // Replace with your method name and params
     
      
@@ -155,16 +186,16 @@ export default function CampaignSingle ({params}) {
                 <div className="dark:border-[1px] dark:border-gray-500  shadow-2xl rounded-lg p-6">
                   <h3 className="font-semibold">Campaign Balance</h3>
                   <div className="text-2xl font-bold">
-                  {Math.round(campaign?.totalFunds/1800000000)} ETH (~${Math.round((campaign?.totalFunds/1800000000) * 1505)   }USD)
+                  {(campaign?.ethtotalFunds*1).toFixed(2)} ETH (~${campaign?.formatedtf }USD)
                     
 
                   </div>
-                  <p>Target: {dummyData.target} ETH (~${getETHPriceInUSD(dummyData.ETHPrice, dummyData.target)} USD)</p>
+                  <p>Target: {campaign?.ethgoal} ETH (~${campaign?.goal} USD)</p>
                   <div className="w-full bg-gray-200 h-2 mt-4 rounded">
                     <div
                       className="bg-orange-600 h-2 rounded"
                       style={{
-                        width: `${(dummyData.balance / dummyData.target) * 100}%`,
+                        width: `${campaign?.progress}%`,
                       }}
                     ></div>
                   </div>
@@ -175,7 +206,7 @@ export default function CampaignSingle ({params}) {
                   <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                     <div>
                       <label className="block dark:text-white text-sm font-medium" htmlFor="value">
-                        Amount in Ether
+                        Amount in Usd
                       </label>
                       
                       <input
@@ -189,7 +220,7 @@ export default function CampaignSingle ({params}) {
                       />
                       {amountInUSD && (
                         <p className="text-sm text-gray-500 mt-2">
-                          ~${getETHPriceInUSD(dummyData.ETHPrice, amountInUSD)}
+                          Eth {(amountInUSD/ethPrice).toFixed(2)}
                         </p>
                       )}
                     </div>

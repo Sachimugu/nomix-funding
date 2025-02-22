@@ -3,17 +3,10 @@ import Image from 'next/image'; // Make sure to import Image if you're using Nex
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../components/ui/card'; // Make sure to import the Card components from your library
 import PaginationLinks from './PaginationLinks';
 import Link from 'next/link';
+import { formatNumber } from '@/lib/EthPrice';
 
 // Function to format numbers with K, M, etc.
-const formatNumber = (num) => {
-  if (num >= 1_000_000) {
-    return (num / 1_000_000).toFixed(1) + 'M';
-  } else if (num >= 1_000) {
-    return (num / 1_000).toFixed(1) + 'K';
-  } else {
-    return num.toString();
-  }
-};
+
 
 const dummyData = {
   pagination: {

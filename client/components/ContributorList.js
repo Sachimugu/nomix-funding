@@ -1,52 +1,59 @@
+import { useEffect, useState } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { convertWeiToUsd } from "@/lib/EthPrice";
 
-// Fake data
-const fakeContributors = [
-  { wallet: "0x12345abcd12345abcd12345abcd12345abcd12345", amount: "2.5 ETH" },
-  { wallet: "0x23456bcde23456bcde23456bcde23456bcde2345", amount: "1.8 ETH" },
-  { wallet: "0x34567cdef34567cdef34567cdef34567cdef3456", amount: "3.2 ETH" },
-  { wallet: "0x45678defg45678defg45678defg45678defg4567", amount: "0.8 ETH" },
-  { wallet: "0x56789efgh56789efgh56789efgh56789efgh5678", amount: "4.0 ETH" },
-  { wallet: "0x6789aefgh6789aefgh6789aefgh6789aefgh6789", amount: "1.0 ETH" },
-  { wallet: "0x789abfghi789abfghi789abfghi789abfghi789a", amount: "0.6 ETH" },
-  { wallet: "0x89abcfghj89abcfghj89abcfghj89abcfghj89ab", amount: "2.3 ETH" },
-  { wallet: "0x9abcdefgh9abcdefgh9abcdefgh9abcdefgh9abc", amount: "5.1 ETH" },
-  { wallet: "0xa123bcdff0xa123bcdff0xa123bcdff0xa123bcd", amount: "1.2 ETH" },
-  { wallet: "0xb234cdefg0xb234cdefg0xb234cdefg0xb234cde", amount: "2.9 ETH" },
-  { wallet: "0xc345deghj0xc345deghj0xc345deghj0xc345deg", amount: "0.5 ETH" },
-  { wallet: "0xd456efhkl0xd456efhkl0xd456efhkl0xd456efh", amount: "3.7 ETH" },
-  { wallet: "0xe567fghlm0xe567fghlm0xe567fghlm0xe567fgh", amount: "4.3 ETH" },
-  { wallet: "0xf678ghilm0xf678ghilm0xf678ghilm0xf678ghil", amount: "1.6 ETH" },
-  { wallet: "0x12345ijkl0x12345ijkl0x12345ijkl0x12345ij", amount: "2.0 ETH" },
-  { wallet: "0x23456jklm0x23456jklm0x23456jklm0x23456jk", amount: "1.4 ETH" },
-  { wallet: "0x34567klmn0x34567klmn0x34567klmn0x34567kl", amount: "3.8 ETH" },
-  { wallet: "0x45678lmno0x45678lmno0x45678lmno0x45678lm", amount: "0.9 ETH" },
-  { wallet: "0x56789mnop0x56789mnop0x56789mnop0x56789m", amount: "1.5 ETH" },
-];
-
-
-function createDonationArray(amounts, identifiers) {
-  if(amounts){
-
-    if (amounts.length !== identifiers.length) {
-      throw new Error("The lengths of the amounts and identifiers arrays must match.");
-    }
-  
-    // Map over the arrays to return an array of objects
-    const result = amounts.map((amount, index) => ({
-      wallet: identifiers[index],  // Get the donor at the same index
-      amount: `${amount} ETH`,      // Format the amount as ETH
-    }));
-    return result;
+// Async function to create the donation array
+async function createDonationArray(amounts, identifiers) {
+  // Check if amounts is falsy or empty
+  if (!amounts || amounts.length === 0) {
+    return []; // Return an empty array or throw an error, depending on your use case
   }
+
   // Check if both arrays are the same length
+  if (amounts.length !== identifiers.length) {
+    throw new Error("The lengths of the amounts and identifiers arrays must match.");
+  }
 
+  // Map over the arrays to return an array of objects
+  const result = await Promise.all(
+    amounts.map(async (amount, index) => {
+      try {
+        const amountInUsd = await convertWeiToUsd(amount);
+        console.log({amount, amountInUsd}) // Convert wei to USD
+        return {
+          wallet: identifiers[index], // Get the donor at the same index
+          amount: `${amount} USD`, // Format the amount as USD
+        };
+      } catch (error) {
+        console.error("Error converting wei to USD:", error);
+        throw new Error("Failed to convert wei to USD.");
+      }
+    })
+  );
+
+  return result;
 }
-export function ContributorList({ isDialogOpen, setIsDialogOpen, wallets, amounts}) {
 
+export function ContributorList({ isDialogOpen, setIsDialogOpen, wallets, amounts }) {
+  const [contributors, setContributors] = useState([]);
 
-   const  Contributors = createDonationArray(amounts, wallets)
+  // Use effect to fetch contributors when component mounts or wallets/amounts change
+  useEffect(() => {
+    const fetchContributors = async () => {
+      try {
+        const result = await createDonationArray(amounts, wallets);
+        setContributors(result); // Set contributors once the data is fetched
+      } catch (error) {
+        console.error("Error fetching contributors:", error);
+      }
+    };
+
+    if (wallets && amounts) {
+      fetchContributors();
+    }
+  }, [wallets, amounts]); // Re-run if wallets or amounts change
+
   return (
     <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <AlertDialogContent>
@@ -64,21 +71,19 @@ export function ContributorList({ isDialogOpen, setIsDialogOpen, wallets, amount
                   </tr>
                 </thead>
                 <tbody className="">
-                  {Contributors?.map((contributor, index) => (
+                  {contributors?.map((contributor, index) => (
                     <tr key={index}>
                       <th>{index + 1}</th>
                       <td className=" ">{contributor.wallet.slice(0,20)}...</td>
-                      <td>{contributor.amount}</td>
+                      <td>$ {(parseInt(contributor.amount)*1).toFixed(0)}</td>
                     </tr>
                   ))}
                 </tbody>
-                
               </table>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          {/* <AlertDialogCancel onClick={() => setIsDialogOpen(false)}></AlertDialogCancel> */}
           <AlertDialogAction onClick={() => setIsDialogOpen(false)}>Okay</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

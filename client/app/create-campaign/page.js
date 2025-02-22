@@ -6,6 +6,7 @@ import axios from "axios";
 import { createCampaign } from "@/lib/crowdFunding";
 import DatePicker from "@/components/DatePicker";
 import { useWalletStore } from "@/store/wallet-store";
+import { convertUsdToWei } from "@/lib/EthPrice";
 
 
 export default function CampaignForm() {
@@ -30,7 +31,10 @@ export default function CampaignForm() {
   // Set up Pinata API details
   const PINATA_API_KEY =process.env.NEXT_PUBLIC_apiKey  // replace with your Pinata API Key
   const PINATA_API_SECRET = process.env.NEXT_PUBLIC_apiSecret // replace with your Pinata API Secret
-  console.log(PINATA_API_KEY, PINATA_API_SECRET);
+  // Convert USD to Ether (example rate used)
+      // const usdToEthConversionRate = 0.0005; // Replace with dynamic rate
+      // const amountInEther = amountInUSD * usdToEthConversionRate; // Convert USD to Ether
+      // const amountInWei = ethers.utils.parseUnits(amountInEther.toString(), 'ether'); // Convert Ether to Wei
   // Drag-and-Drop Image handling using `react-dropzone`
   const { getRootProps, getInputProps } = useDropzone({
     accept: "image/*", // Allow only images
@@ -100,9 +104,9 @@ export default function CampaignForm() {
           duration,
           imageHash: ipfsHash,
         });
-
-
-        await handleCreateCampaign(campaignName, campaignDescription, campaignTarget, duration, ipfsHash,)
+        const goal = await convertUsdToWei(campaignTarget)
+        console.log(goal);
+        await handleCreateCampaign(campaignName, campaignDescription, goal, duration, ipfsHash,)
 
     setIsLoading(false)
       
@@ -190,7 +194,7 @@ export default function CampaignForm() {
               value={campaignTarget}
               onChange={(e) => setCampaignTarget(e.target.value)}
               className="mt-2 w-full p-3 border-[0.1px] border-gray-600 rounded-md focus:outline-none focus:ring-gray-500 focus:ring-[0.6px]"
-              placeholder="Target your campaign"
+              placeholder="Target in USD"
             />
             {errors.target && <p className="text-red-500 text-sm">{errors.target}</p>}
           </div>

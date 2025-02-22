@@ -166,7 +166,7 @@ export const useWalletStore = create((set, get) => {
         return {success:true, msg:receipt}; // Return the transaction receipt
       } catch (error) {
         const errorMessage = handleError(error);
-        // console.error('Error calling transaction function:', errorMessage);
+        console.error('Error calling transaction function:', errorMessage);
         return {success:false, msg:errorMessage}; // Return the error message
       }
     },

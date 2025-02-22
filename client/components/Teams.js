@@ -71,7 +71,7 @@ export const TeamSection = () => {
         goalReached: campaign.goalReached,
         isClosed: campaign.isClosed,
         donors: campaign.donors.length,  // Number of donors
-        donations: campaign.donations.reduce((total, amount) => total + amount, 0).toString(),  // Sum of donations
+        donations: campaign.donations.reduce((total, amount) => total + parseInt(amount), 0).toString(),  // Sum of donations
       };
   
       // console.log('Formatted campaign:', formattedCampaign);
