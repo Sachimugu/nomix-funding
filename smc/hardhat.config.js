@@ -1,15 +1,22 @@
 require("@nomicfoundation/hardhat-toolbox");
 require('dotenv').config();
 
-// console.log("ALCHEMY_API_KEY:", process.env.ALCHEMY_API_KEY);
+const SEPOLIA_URL = process.env.SEPOLIA_URL;
+const PRIVATE_KEY = process.env.PRIVATE_KEY
 
+console.log({SEPOLIA_URL, PRIVATE_KEY})
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.28",
-  // networks: {
-  //   sepolia: {
-  //     url:   // Sepolia Alchemy URL
-  //     accounts:  // Use your private key here
-  //   }
-  // }
+  settings: {
+    optimizer: {
+      enabled: true,
+      runs: 200,
+    },},
+  networks: {
+    sepolia: {
+      url: SEPOLIA_URL,
+      accounts: [PRIVATE_KEY], // Or { mnemonic: yourMnemonic } if using a mnemonic
+    },
+  }
 };

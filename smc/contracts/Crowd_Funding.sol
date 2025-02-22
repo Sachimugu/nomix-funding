@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.28;
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 contract CrowdFunding {
 
   AggregatorV3Interface internal priceFeed;
 
-    constructor() {
+    constructor(address _priceFeedAddress) {
         // Initialize the price feed address for Sepolia ETH/USD (this is just an example, please ensure you use the correct address for Sepolia network)
-        priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306); // Sepolia ETH/USD address
+        priceFeed = AggregatorV3Interface(_priceFeedAddress);// Sepolia ETH/USD address
     }
 
      function getLatestPrice() public view returns (int) {
