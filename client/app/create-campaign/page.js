@@ -7,6 +7,7 @@ import { createCampaign } from "@/lib/crowdFunding";
 import DatePicker from "@/components/DatePicker";
 import { useWalletStore } from "@/store/wallet-store";
 import { convertUsdToWei } from "@/lib/EthPrice";
+import { toBigInt } from "ethers";
 
 
 export default function CampaignForm() {
@@ -104,8 +105,9 @@ export default function CampaignForm() {
           duration,
           imageHash: ipfsHash,
         });
-        const goal = await convertUsdToWei(campaignTarget)
-        console.log(goal);
+        const x = await convertUsdToWei(parseInt(campaignTarget))
+        const goal = BigInt(100000000000000000000000000000000000000000000000000000000000000n)
+        console.log("Converted USD target to Wei:", goal)
         await handleCreateCampaign(campaignName, campaignDescription, goal, duration, ipfsHash,)
 
     setIsLoading(false)

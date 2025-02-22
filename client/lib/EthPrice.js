@@ -17,8 +17,8 @@ export async function convertUsdToWei(amountInUSD) {
 
         // Convert Ether to Wei (1 Ether = 10^18 Wei)
         const amountInWei = amountInEther * Math.pow(10, 18);
-        const ooo = convertToBigIntIfNeeded(amountInWei)
-        console.log(amountInWei);
+        const ooo = BigInt(amountInWei)
+        console.log({amountInWei, ooo});
 
         return ooo;
     } catch (error) {

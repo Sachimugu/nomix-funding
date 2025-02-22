@@ -1,12 +1,56 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.26;
-
+pragma solidity ^0.8.7;
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 contract CrowdFunding {
 
+  AggregatorV3Interface internal priceFeed;
+
+    constructor() {
+        // Initialize the price feed address for Sepolia ETH/USD (this is just an example, please ensure you use the correct address for Sepolia network)
+        priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306); // Sepolia ETH/USD address
+    }
+
+     function getLatestPrice() public view returns (int) {
+    (, int price, , , ) = priceFeed.latestRoundData();
+    // Scale the price down to 2 decimal places
+    int scaledPrice = price / 10**6;  // Divide by 10^6 to move the decimal point
+    return scaledPrice;  // Price in 2 decimal places
+}
+
+
+    function convertUSDToWei(uint256 usdAmount) public view returns (uint256) {
+        // Get the current ETH price in USD
+        int ethPriceInUSD = getLatestPrice();
+        require(ethPriceInUSD > 0, "Failed to fetch ETH price");
+
+        // Convert USD to ETH (in ETH)
+        uint256 ethAmount = (usdAmount * 10**8) / uint256(ethPriceInUSD); // ETH price has 8 decimals
+
+        // Convert ETH to Wei (1 ETH = 10^18 Wei)
+        uint256 ethAmountInWei = ethAmount * 10**18;
+
+        return ethAmountInWei;
+    }
+
+    // Convert Wei to USD
+    function convertWeiToUSD(uint256 weiAmount) public view returns (uint256) {
+        // Get the current ETH price in USD
+        int ethPriceInUSD = getLatestPrice();
+        require(ethPriceInUSD > 0, "Failed to fetch ETH price");
+
+        // Convert Wei to ETH (1 ETH = 10^18 Wei)
+        uint256 ethAmount = weiAmount / 10**18;
+
+        // Convert ETH to USD
+        uint256 usdAmount = (ethAmount * uint256(ethPriceInUSD)) / 10**8; // ETH price has 8 decimals
+
+        return usdAmount;
+    }
     // Campaign structure
     struct Campaign {
         address creator;       // Address of the campaign creator
-        uint256 goal;          // Funding goal in wei
+        uint256 goal;  
+        uint256 min_donation;        // Funding goal in wei
         uint256 deadline;      // Deadline for the campaign
         uint256 totalFunds;    // Total funds raised so far
         string description;  
@@ -46,13 +90,14 @@ contract CrowdFunding {
     }
 
     // Function to create a new campaign
-    function createCampaign(string memory _name, string memory _description, uint256 _goal, uint256 _duration, string memory _imageUrl  ) public {
+    function createCampaign(string memory _name, string memory _description, uint256 _goal, uint256 _duration, uint256 _min_donation, string memory _imageUrl  ) public {
         require(_goal > 0, "Goal must be greater than 0");
         require(_duration > 0, "Duration must be greater than 0");
 
         uint256 deadline = block.timestamp + _duration;
         Campaign memory newCampaign = Campaign({
             creator: msg.sender,
+            min_donation:_min_donation,
             goal: _goal,
             deadline: deadline,
             imageUrl:_imageUrl,
@@ -75,15 +120,16 @@ contract CrowdFunding {
     }
 
     // Function to contribute to a campaign
-   function contribute(uint256 campaignId, uint256 amount) public payable isActive(campaignId) {
-    require(amount > 0, "Contribution must be greater than 0");
-    require(msg.value == amount, "Sent value does not match the specified amount");
-
+   function contribute(uint256 campaignId) public payable isActive(campaignId) {
     Campaign storage campaign = campaigns[campaignId];
-    campaign.totalFunds += amount;
-    campaign.donations.push(amount);
+    require(msg.value > convertUSDToWei(campaign.min_donation), "Contribution must be greater than 0");
+    require(campaign.goalReached, "Goal reached");
+    // require(msg.value == amount, "Sent value does not match the specified amount");
+
+    campaign.totalFunds += msg.value;
+    campaign.donations.push(msg.value);
     campaign.donors.push(msg.sender);
-    emit DonationMade(campaignId, msg.sender, amount);
+    emit DonationMade(campaignId, msg.sender, msg.value);
 
     // Check if the goal has been reached
     if (campaign.totalFunds >= campaign.goal) {
