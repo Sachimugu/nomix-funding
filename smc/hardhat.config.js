@@ -1,7 +1,7 @@
 require("@nomicfoundation/hardhat-toolbox");
 require('dotenv').config();
 
-const SEPOLIA_URL = process.env.SEPOLIA_URL;
+const URL = process.env.SEPOLIA_URL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY
 
 console.log({SEPOLIA_URL, PRIVATE_KEY})
@@ -15,7 +15,7 @@ module.exports = {
     },},
   networks: {
     sepolia: {
-      url: SEPOLIA_URL,
+      url:URL,
       accounts: [PRIVATE_KEY], // Or { mnemonic: yourMnemonic } if using a mnemonic
     },
   }

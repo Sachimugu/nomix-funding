@@ -37,14 +37,16 @@ export const TeamSection = () => {
     
    
       // const data = await callReadOnlyFunction('getPaginatedCampaigns', 0,8); // Replace with your method name and params
-      const [data, currentPage, totalPages, totalCampaigns] = await callReadOnlyFunction('getPaginatedCampaigns', 0,8); // Replace with your method name and params
-      console.log("Total Campaigns:", totalCampaigns); // Convert BigNumber to number
-      console.log("Current Page:", currentPage);
-      console.log("Total Pages:", totalPages);
-      console.log('Contract data:', data);
-      const formattedData = await getFormattedCampaigns(data);
-      setAllCampaigns(formattedData);
-      console.log('All campaigns:', allCampaigns);
+      // const [data, currentPage, totalPages, totalCampaigns] = await callReadOnlyFunction('getPaginatedCampaigns', 0,8); // Replace with your method name and params
+     const x = await callReadOnlyFunction('number'); // Replace with your method name and params
+      console.log({x}); // Convert BigNumber to number
+      // console.log("Total Campaigns:", totalCampaigns); // Convert BigNumber to number
+      // console.log("Current Page:", currentPage);
+      // console.log("Total Pages:", totalPages);
+      // console.log('Contract data:', data);
+      // const formattedData = await getFormattedCampaigns(data);
+      // setAllCampaigns(formattedData);
+      // console.log('All campaigns:', allCampaigns);
     
   };
 
