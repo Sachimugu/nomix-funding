@@ -6,10 +6,11 @@ import WithdrawFunds from "@/components/WithdrawFunds";
 import { convertUsdToWei, convertWeiToUsd, formatNumber, getEthPrice } from "@/lib/EthPrice";
 import { useWalletStore } from "@/store/wallet-store";
 import { progress } from "motion";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function CampaignSingle ({params}) {
-    const { connectWallet, callReadOnlyFunction, callTransactionFunction,contract, walletAddress } = useWalletStore();
+    const { connectWallet, callReadOnlyFunction, callReadOnlyFunctionWithPrivateKey, callTransactionFunction,contract, walletAddress } = useWalletStore();
   
 
     
@@ -28,7 +29,7 @@ export default function CampaignSingle ({params}) {
     };
     
 
-    const [amountInUSD, setAmountInUSD] = useState();
+    const [amountInEth, setAmountInEth] = useState();
     const [isDialogOpenForRefund, setIsDialogOpenForRefund] = useState(false);
     const [isDialogOpenForWithdrawal, setIsDialogOpenForWithdrawal] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -43,18 +44,19 @@ export default function CampaignSingle ({params}) {
   
       // Convert USD to Ether (example rate used)
       // const usdToEthConversionRate = 0.0005; // Replace with dynamic rate
-      // const amountInEther = amountInUSD * usdToEthConversionRate; // Convert USD to Ether
+      // const amountInEther = amountInEth * usdToEthConversionRate; // Convert USD to Ether
       // const amountInWei = ethers.utils.parseUnits(amountInEther.toString(), 'ether'); // Convert Ether to Wei
   
-      // console.log(`Contributing: ${amountInUSD} USD which equals to ${amountInEther} ETH`);
+      // console.log(`Contributing: ${amountInEth} USD which equals to ${amountInEther} ETH`);
   
       // Call the contribute method
-      const amount =await convertUsdToWei(amountInUSD)
-      const data = await callTransactionFunction('contribute', campaignId, amount,{
+      const amount = parseInt(amountInEth)
+      console.log({ amount,amountInEth})
+      const data = await callTransactionFunction('contribute', campaignId, {
         value:amount
       });
   
-      setAmountInUSD(''); // Reset the input after the transaction
+      // setAmountInEth(''); // Reset the input after the transaction
   };
   
     const getETHPriceInUSD = (ETHPrice, amountInETH) => {
@@ -95,6 +97,7 @@ export default function CampaignSingle ({params}) {
                 return await convertWeiToUsd(parseInt(donation)); // Convert BigNumber array
             })
         );
+        const PINATA_BASE_URL = "https://gateway.pinata.cloud/ipfs/";
 
         return {
             creator: campaign.creator,
@@ -102,7 +105,9 @@ export default function CampaignSingle ({params}) {
             deadline: new Date(parseInt(campaign.deadline) * 1000).toLocaleString(), // Format timestamp to date
             totalFunds, // Convert BigNumber to number
             description: campaign.description,
-            imageUrl: campaign.imageUrl,
+            // imageUrl: campaign.imageUrl,
+
+            imageUrl:`${PINATA_BASE_URL}${campaign.imageUrl}`,
             name: campaign.name,
             goalReached: campaign.goalReached,
             isClosed: campaign.isClosed,
@@ -111,7 +116,8 @@ export default function CampaignSingle ({params}) {
             ethgoal,
             progress: (totalFunds/parseFloat(campaign.goal)*100),
             formatedtf,
-            ethtotalFunds
+            ethtotalFunds,
+            minimumFunds: parseInt(campaign.min_donation)
         };
     } catch (error) {
         console.error('Error formatting campaign data:', error);
@@ -126,9 +132,10 @@ export default function CampaignSingle ({params}) {
     
       const eth = await getEthPrice()
       setEthPrice(eth) // Replace with your method name and params
-      const data = await callReadOnlyFunction('getCampaignByIndex', campaignId);
+      const data = await callReadOnlyFunctionWithPrivateKey('getCampaignByIndex', campaignId);
+      console.log({data}) // Replace with your method name and params
       const campaignDetails = await formatCampaignData(data) 
-      // console.log({campaignDetails})
+      console.log({campaignDetails})
       setCampaign(campaignDetails) // Replace with your method name and params
     
      
@@ -136,28 +143,47 @@ export default function CampaignSingle ({params}) {
   };
 
   fetchContractData()
-  },[amountInUSD])
+  },[amountInEth])
 
   console.log(campaign)
+
   
     return (
       <div>
-        <div className="">
+        <div className="pt-8">
         
           <div className="max-w-[90rem] mx-auto py-6 px-4">
             <div className="flex flex-col md:flex-row  gap-6 md:gap-28">
               <div className="flex-1  space-y-4 ">
                 <h1 className="text-4xl font-bold">{campaign?.name}</h1>
-                <p className="text-lg text-gray-600 dark:text-gray-400">{campaign?.description}</p>
-                <a href={`https://rinkeby.etherscan.io/address/${dummyData.id}`} className="text-orange-600 hover:text-orange-700">
-                  View on Rinkeby Etherscan
+                <p className="text-lg h-[18rem] pt-4 text-gray-600 dark:text-gray-400">{campaign?.description.slice(0, 700)}</p>
+
+                <a href={`https://rinkeby.etherscan.io/address/${dummyData.id}`} className=" text-orange-600 hover:text-orange-700">
+                  <p className="pt-4">
+                    View on Sepolia Etherscan
+                    
+                    </p>
                 </a>
-                <div className="mt-8">
+                <div className="pt-">
                   <div className=" flex flex-col  gap-6">
-                    <div className="border border-gray-600 shadow-lg rounded-lg p-5">
-                      <h3 className="font-semibold">Minimum Contribution</h3>
-                      <p>{dummyData.minimumContribution} ETH (~${getETHPriceInUSD(dummyData.ETHPrice, dummyData.minimumContribution)} USD)</p>
-                    </div>
+                <div className="dark:border-[1px] dark:border-gray-500  shadow-2xl rounded-lg p-5">
+                  <h3 className="font-semibold">Campaign Balance</h3>
+                  <div className="text-2xl font-bold">
+                  {(campaign?.ethtotalFunds*1).toFixed(2)} ETH (~${campaign?.formatedtf }USD)
+                    
+
+                  </div>
+                  <p>Target: {campaign?.goal} ETH (~${Math.round(campaign?.goal*ethPrice)} USD)</p>
+                  <div className="w-full bg-gray-200 h-2 mt-4 rounded">
+                    <div
+                      className="bg-orange-600 h-2 rounded"
+                      style={{
+                        width: `${campaign?.progress}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+                  
                     <div className="border border-gray-600 shadow-lg rounded-lg p-5">
                       <h3 className="font-semibold">Wallet Address of Campaign Creator</h3>
                       <p>{campaign?.creator}</p>
@@ -183,30 +209,27 @@ export default function CampaignSingle ({params}) {
               </div>
   
               <div className="flex-1 space-y-6 ">
-                <div className="dark:border-[1px] dark:border-gray-500  shadow-2xl rounded-lg p-6">
-                  <h3 className="font-semibold">Campaign Balance</h3>
-                  <div className="text-2xl font-bold">
-                  {(campaign?.ethtotalFunds*1).toFixed(2)} ETH (~${campaign?.formatedtf }USD)
-                    
 
-                  </div>
-                  <p>Target: {campaign?.ethgoal} ETH (~${campaign?.goal} USD)</p>
-                  <div className="w-full bg-gray-200 h-2 mt-4 rounded">
-                    <div
-                      className="bg-orange-600 h-2 rounded"
-                      style={{
-                        width: `${campaign?.progress}%`,
-                      }}
-                    ></div>
-                  </div>
-                </div>
+              <div className="pt-8   overflow-hidden">
+    <img
+      src={campaign?.imageUrl}
+      alt={campaign?.name}
+      className=" h-[23rem] w-full object-cover saturate-100 transition-all duration-200 ease-linear group-hover/hoverimg:saturate-50 group-hover/hoverimg:scale-[1.01]"
+    />
+  </div>
+  <div className="border border-gray-600 shadow-lg rounded-lg p-5">
+                      <h3 className="font-semibold">Minimum Contribution</h3>
+                      <p>{(campaign?.minimumFunds/ethPrice).toFixed(3)} ETH (~${campaign?.minimumFunds} USD)</p>
+                    </div>
+
+            
   
                 <div className="dark:border-[1px] dark:border-gray-500  rounded-lg  dark:text-gray-800 shadow-2xl p-6">
                   <h3 className="text-xl font-semibold text-orange-600">Contribute Now!</h3>
                   <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                     <div>
                       <label className="block dark:text-white text-sm font-medium" htmlFor="value">
-                        Amount in Usd
+                        Amount in Eth
                       </label>
                       
                       <input
@@ -215,12 +238,12 @@ export default function CampaignSingle ({params}) {
                         name="value"
                         className="mt-1 p-2 w-full border-[1px] border-gray-400 rounded bg-gray-200 focus:outline-none focus:ring-gray-500 focus:ring-[0.6px]"
                         onChange={(e) => {
-                          setAmountInUSD(Math.abs(e.target.value));
+                          setAmountInEth(Math.abs(e.target.value));
                         }}
                       />
-                      {amountInUSD && (
+                      {amountInEth && (
                         <p className="text-sm text-gray-500 mt-2">
-                          Eth {(amountInUSD/ethPrice).toFixed(2)}
+                          ~${Math.round(amountInEth*ethPrice)} USD
                         </p>
                       )}
                     </div>

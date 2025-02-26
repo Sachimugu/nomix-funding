@@ -24,7 +24,7 @@ contract CrowdFunding {
         require(ethPriceInUSD > 0, "Failed to fetch ETH price");
 
         // Convert USD to ETH (in ETH)
-        uint256 ethAmount = (usdAmount * 10**8) / uint256(ethPriceInUSD); // ETH price has 8 decimals
+        uint256 ethAmount = (usdAmount * 10**2) / uint256(ethPriceInUSD); // ETH price has 8 decimals
 
         // Convert ETH to Wei (1 ETH = 10^18 Wei)
         uint256 ethAmountInWei = ethAmount * 10**18;
@@ -42,7 +42,7 @@ contract CrowdFunding {
         uint256 ethAmount = weiAmount / 10**18;
 
         // Convert ETH to USD
-        uint256 usdAmount = (ethAmount * uint256(ethPriceInUSD)) / 10**8; // ETH price has 8 decimals
+        uint256 usdAmount = (ethAmount * uint256(ethPriceInUSD)) / 10**2; // ETH price has 8 decimals
 
         return usdAmount;
     }
@@ -71,7 +71,7 @@ contract CrowdFunding {
     // Array to store all campaigns
     Campaign[] public campaigns;
     uint256[] public campaignIds;
-    uint256 public number = 565656565;
+    int public EthPrice = getLatestPrice();
 
     // Mapping to track dress to campaign
     mapping(address => Campaign) public addressToCampaign;

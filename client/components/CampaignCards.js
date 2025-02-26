@@ -48,7 +48,7 @@ const CampaignCards = ({ campaigns }) => {
 
         // Truncate description if it's too long
         const truncatedDescription = formattedCampaign.description.length > 100
-          ? `${formattedCampaign.description.substring(0, 100)}...`
+          ? `${formattedCampaign.description.substring(0, 90)}...`
           : formattedCampaign.description;
 
 
