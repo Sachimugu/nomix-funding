@@ -52,6 +52,11 @@ export default function DatePicker({durationError, setDurationError, setDuration
 
 
   return (
+
+    <div className=" block">
+    <label htmlFor="campaignName" className="block text-lg font-medium">
+              Campaign Deadline
+            </label>
     <Popover>
       <PopoverTrigger asChild>
         <Button
@@ -76,5 +81,6 @@ export default function DatePicker({durationError, setDurationError, setDuration
       {/* Error message display */}
       {durationError && <div className="text-red-500 text-sm mt-2">{durationError}</div>}
     </Popover>
+    </div>
   );
 }

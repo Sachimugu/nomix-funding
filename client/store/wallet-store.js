@@ -45,6 +45,7 @@ export const useWalletStore = create((set, get) => {
   
   // Initial state with persisted values (if any)
   return {
+  
     provider: null,
     contract: null,
     walletAddress: walletAddress || null,
@@ -226,6 +227,38 @@ export const useWalletStore = create((set, get) => {
         console.error('Error calling read-only function:', error);
       }
     },
+
+
+    // const { ethers } = require('ethers');
+
+callReadOnlyFunctionWithPrivateKey : async (methodName, ...params) => {
+ 
+
+  try {
+    console.log('Contract not available. Creating wallet instance...');
+
+    const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_URL);
+    console.log({provider})
+
+    const wallet = new ethers.Wallet(process.env.NEXT_PUBLIC_PRIVATE_KEY, provider);
+    console.log('Wallet created:', wallet);
+
+    const address = await wallet.getAddress();
+    console.log('Wallet address:', address);
+
+
+    const newContract = new ethers.Contract(
+      process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+      CONTRACT_ABI['abi'],
+      wallet
+    )
+    const result = await newContract[methodName](...params);
+    console.log('Read-only function result:', result);
+    return result;
+  } catch (error) {
+    console.error('Error calling read-only function:', error);
+  }
+},
     // Disconnect wallet
     disconnectWallet: () => {
       // Clear localStorage

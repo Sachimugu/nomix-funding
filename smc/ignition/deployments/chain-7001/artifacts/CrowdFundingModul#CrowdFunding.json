@@ -1,4 +1,4 @@
-const CONTRACT_ABI ={
+{
   "_format": "hh-sol-artifact-1",
   "contractName": "CrowdFunding",
   "sourceName": "contracts/Crowd_Funding.sol",
@@ -645,6 +645,3 @@ const CONTRACT_ABI ={
   "linkReferences": {},
   "deployedLinkReferences": {}
 }
-
-
-  export default CONTRACT_ABI

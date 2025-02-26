@@ -1,10 +1,10 @@
 require("@nomicfoundation/hardhat-toolbox");
 require('dotenv').config();
 
-const URL = process.env.SEPOLIA_URL;
+const URL = process.env.URL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY
 
-console.log({SEPOLIA_URL, PRIVATE_KEY})
+console.log({URL, PRIVATE_KEY})
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.28",
@@ -14,7 +14,7 @@ module.exports = {
       runs: 200,
     },},
   networks: {
-    sepolia: {
+    zetachain: {
       url:URL,
       accounts: [PRIVATE_KEY], // Or { mnemonic: yourMnemonic } if using a mnemonic
     },

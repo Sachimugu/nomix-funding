@@ -1,12 +1,13 @@
+'use client'
 import React, { useState } from 'react';
 import Image from 'next/image'; // Make sure to import Image if you're using Next.js
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../components/ui/card'; // Make sure to import the Card components from your library
 import PaginationLinks from './PaginationLinks';
 import Link from 'next/link';
 import { formatNumber } from '@/lib/EthPrice';
+import usePaginationStore from '@/store/pagination-store';
 
 // Function to format numbers with K, M, etc.
-
 
 const dummyData = {
   pagination: {
@@ -23,7 +24,7 @@ const dummyData = {
 
 const CampaignCards = ({ campaigns }) => {
   const PINATA_BASE_URL = "https://gateway.pinata.cloud/ipfs/";
-  const [currentPage, setCurrentPage] = useState(dummyData.pagination.page);
+  // const [currentPage, setCurrentPage] = useState(dummyData.pagination.page);
 
 
   return (
@@ -42,7 +43,8 @@ const CampaignCards = ({ campaigns }) => {
         };
 
         // Calculate the progress (random percent for the demo)
-        const goalProgress = Math.min(Math.random(), 1); // Random progress (0 to 1)
+        // const goalProgress = Math.min(Math.random(), 1); // Random progress (0 to 1)
+        const goalProgress = formattedCampaign.raisedFunds/formattedCampaign.goal// Random progress (0 to 1)
 
         // Truncate description if it's too long
         const truncatedDescription = formattedCampaign.description.length > 100
@@ -61,17 +63,17 @@ const CampaignCards = ({ campaigns }) => {
                   alt={formattedCampaign.name}
                   width={300}
                   height={300}
-                  className="w-full aspect-square object-cover saturate-0 transition-all duration-200 ease-linear size-full group-hover/hoverimg:saturate-100 group-hover/hoverimg:scale-[1.01]"
+                  className="w-full aspect-square object-cover saturate-100 transition-all duration-200 ease-linear size-full group-hover/hoverimg:saturate-50 group-hover/hoverimg:scale-[1.01]"
                 />
               </div>
-              <CardTitle className="py-6 pb-4 px-6">
-                {formattedCampaign.name}
+              <CardTitle className="py-6 pb-4 px-6 flex">
+                {formattedCampaign.name.slice(0,25)} {formattedCampaign.name.length>25? <div>{}...</div>:''}
               </CardTitle>
             </CardHeader>
 
             <CardContent className="pb-0 text-muted-foreground px-6">
               <p className="text-sm mt-2">
-                <strong>Goal:</strong> ${formatNumber(formattedCampaign.goal)} {/* Formatting to max 2 digits */}
+               Target:  <strong className='text-orange-600'>{formatNumber(formattedCampaign.goal)} Eth</strong> {/* Formatting to max 2 digits */}
               </p>
             </CardContent>
 
@@ -83,7 +85,7 @@ const CampaignCards = ({ campaigns }) => {
             <CardContent className="pb-0 px-6 mt-4">
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-semibold text-orange-600">
-                  ${formatNumber(formattedCampaign.raisedFunds)} {/* Display current funds */}
+                {goalProgress * 100}% {/* Display current funds */}
                 </span>
                 <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
                   <div
@@ -92,7 +94,7 @@ const CampaignCards = ({ campaigns }) => {
                   />
                 </div>
                 <span className="text-sm font-semibold text-orange-600">
-                  ${formatNumber(formattedCampaign.goal)} {/* Display goal at the end */}
+                  {100}% {/* Display goal at the end */}
                 </span>
               </div>
             </CardContent>
@@ -105,7 +107,7 @@ const CampaignCards = ({ campaigns }) => {
         );
       })}
     </div>
-    <PaginationLinks currentPage = {currentPage} setCurrentPage = {setCurrentPage} dummyData={dummyData}/>
+    <PaginationLinks dummyData={dummyData}/>
 
     </div>
   );

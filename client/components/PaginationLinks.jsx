@@ -1,24 +1,28 @@
 import React, { useState } from "react";
 import Pagination from "./Pagination";
+import usePaginationStore from "@/store/pagination-store";
 
 // Dummy data for products
 
 
-const PaginationLinks = ({currentPage, setCurrentPage, dummyData}) => {
+const PaginationLinks = ({ dummyData}) => {
+  const{currentPage, totalCampaigns,totalPages, setCurrentPage}= usePaginationStore()
+
   const productsPerPage = 8;
 
   // Calculate start and end indices
   const startProductIndex = (currentPage - 1) * productsPerPage + 1;
+
   const endProductIndex = Math.min(
     currentPage * productsPerPage,
-    dummyData.pagination.totalProducts
+    totalCampaigns
   );
 
   // Get products for the current page
-  const currentPageProducts = dummyData.products.slice(
-    (currentPage - 1) * productsPerPage,
-    currentPage * productsPerPage
-  );
+  // const currentPageProducts = dummyData.products.slice(
+  //   (currentPage - 1) * productsPerPage,
+  //   currentPage * productsPerPage
+  // );
 
   return (
     <div>
@@ -31,13 +35,13 @@ const PaginationLinks = ({currentPage, setCurrentPage, dummyData}) => {
           </span>{" "}
           of{" "}
           <span className="font-semibold text-orange-600">
-            {dummyData.pagination.totalProducts}
+            {totalCampaigns}
           </span>
         </span>
 
         {/* Pagination Component */}
         <Pagination
-          totalPages={Math.ceil(dummyData.pagination.totalProducts / productsPerPage)}
+          totalPages={totalPages}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
         />

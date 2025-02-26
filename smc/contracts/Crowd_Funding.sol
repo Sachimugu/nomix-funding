@@ -46,6 +46,12 @@ contract CrowdFunding {
 
         return usdAmount;
     }
+
+
+    function etherToWei(uint256 _etherAmount) public view returns (uint256) {
+        // 1 Ether = 10^18 Wei, so multiply by 10^18 to convert
+        return _etherAmount * 10**18;
+    }
     // Campaign structure
     struct Campaign {
         address creator;       // Address of the campaign creator
@@ -98,7 +104,7 @@ contract CrowdFunding {
         Campaign memory newCampaign = Campaign({
             creator: msg.sender,
             min_donation:_min_donation,
-            goal: _goal,
+            goal: etherToWei(_goal),
             deadline: deadline,
             imageUrl:_imageUrl,
             totalFunds: 0,

@@ -12,6 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import CampaignCards from "./CampaignCards";
+import usePaginationStore from "@/store/pagination-store";
 
 const socialIcon = (socialName) => {
   switch (socialName) {
@@ -30,25 +31,32 @@ export const TeamSection = () => {
 
 
 
-  const { connectWallet, callReadOnlyFunction, contract, walletAddress } = useWalletStore();
+  const { connectWallet, callReadOnlyFunction, contract, walletAddress , callReadOnlyFunctionWithPrivateKey} = useWalletStore();
   const [allCampaigns, setAllCampaigns] = useState([]);
+  const {setTotalPages,setCurrentPage,setTotalCampaigns}=usePaginationStore()
 
   const fetchContractData = async () => {
     
    
       // const data = await callReadOnlyFunction('getPaginatedCampaigns', 0,8); // Replace with your method name and params
-      // const [data, currentPage, totalPages, totalCampaigns] = await callReadOnlyFunction('getPaginatedCampaigns', 0,8); // Replace with your method name and params
-     const x = await callReadOnlyFunction('number'); // Replace with your method name and params
-      console.log({x}); // Convert BigNumber to number
-      // console.log("Total Campaigns:", totalCampaigns); // Convert BigNumber to number
+      const [data, currentPage, totalPages, totalCampaigns] = await callReadOnlyFunctionWithPrivateKey('getPaginatedCampaigns', 0,8);
+      setTotalPages(parseInt(totalPages)),setCurrentPage(parseInt(currentPage)) ,setTotalCampaigns(data.length);
+       // Replace with your method name and params
+    //  const x = await callReadOnlyFunction('number'); // Replace with your method name and params
+      // console.log({x}); // Convert BigNumber to number
+      console.log("Total Campaigns:", ); // Convert BigNumber to number
       // console.log("Current Page:", currentPage);
-      // console.log("Total Pages:", totalPages);
+      console.log("Total Pages:", totalPages);
       // console.log('Contract data:', data);
-      // const formattedData = await getFormattedCampaigns(data);
-      // setAllCampaigns(formattedData);
+      const formattedData = await getFormattedCampaigns(data);
+      setAllCampaigns(formattedData);
       // console.log('All campaigns:', allCampaigns);
     
   };
+
+  useEffect(()=>{
+    fetchContractData();
+  },[])
 
 
 
@@ -92,8 +100,7 @@ export const TeamSection = () => {
   return (
     <section id="team" className="container lg:w-[75%] py-24 sm:py-32 mx-auto">
       <div>
-      <button onClick={fetchContractData}>Fetch Contract Data</button>
-      {walletAddress && <p>Wallet Address: {walletAddress}</p>}
+   
     </div>
       <div className="text-center mb-8">
         <h2 className="text-lg text-primary text-center mb-2 tracking-wider">Team</h2>

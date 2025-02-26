@@ -15,6 +15,7 @@ export default function CampaignForm() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [campaignName, setCampaignName] = useState("");
+  const [minDonation, setMinDonation] = useState("");
   const [campaignDescription, setCampaignDescription] = useState("");
   const [campaignTarget, setCampaignTarget] = useState("");
   const [campaignImage, setCampaignImage] = useState(null);
@@ -80,6 +81,10 @@ export default function CampaignForm() {
       setDurationError("Campaign Duration is required")
       isValid = false;
     }
+    if (!minDonation){
+      setDurationError("Minium Dination is required")
+      isValid = false;
+    }
 
     setErrors(formErrors);
 
@@ -103,12 +108,13 @@ export default function CampaignForm() {
           campaignDescription,
           campaignTarget,
           duration,
+          minDonation,
           imageHash: ipfsHash,
         });
-        const x = await convertUsdToWei(parseInt(campaignTarget))
-        const goal = BigInt(100000000000000000000000000000000000000000000000000000000000000n)
-        console.log("Converted USD target to Wei:", goal)
-        await handleCreateCampaign(campaignName, campaignDescription, goal, duration, ipfsHash,)
+        // const x = await convertUsdToWei(parseInt(campaignTarget))
+        // const goal = BigInt(100000000000000000000000000000000000000000000000000000000000000n)
+        // console.log("Converted USD target to Wei:", goal)
+        await handleCreateCampaign(campaignName, campaignDescription, campaignTarget, duration, minDonation, ipfsHash,)
 
     setIsLoading(false)
       
@@ -147,9 +153,9 @@ export default function CampaignForm() {
 
 
     // Create new campaign
-    const handleCreateCampaign = async (name, description, goal, duration, image) => {
+    const handleCreateCampaign = async (name, description, campaignTarget, duration, minDonation, image) => {
       try {
-          const txReceipt = await callTransactionFunction('createCampaign', name, description, parseInt(goal), parseInt(duration), image); // Replace with your function and params
+          const txReceipt = await callTransactionFunction('createCampaign', name, description, parseInt(campaignTarget), parseInt(duration), parseInt(minDonation), image); // Replace with your function and params
         console.log('Transaction receipt:', txReceipt);
       } catch (error) {
         console.error("Error creating campaign:", error);
@@ -196,7 +202,7 @@ export default function CampaignForm() {
               value={campaignTarget}
               onChange={(e) => setCampaignTarget(e.target.value)}
               className="mt-2 w-full p-3 border-[0.1px] border-gray-600 rounded-md focus:outline-none focus:ring-gray-500 focus:ring-[0.6px]"
-              placeholder="Target in USD"
+              placeholder="Target in ETH"
             />
             {errors.target && <p className="text-red-500 text-sm">{errors.target}</p>}
           </div>
@@ -217,7 +223,25 @@ export default function CampaignForm() {
           />
           {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+        <div>
+            <label htmlFor="campaignName" className="block text-lg font-medium">
+              Minimum Donation
+            </label>
+            <input
+              type="text"
+              id="minDonation"
+              value={minDonation}
+              onChange={(e) => setMinDonation(e.target.value)}
+              className="mt-2 w-full p-3 border-[0.1px] border-gray-600 rounded-md focus:outline-none focus:ring-gray-500 focus:ring-[0.6px]"
+              placeholder="Minimum donation in USD"
+            />
+            {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+          </div>
         <DatePicker setDuration={setDuration} durationError ={durationError} setDurationError ={setDurationError}/>
+        {/* <DatePicker setDuration={setDuration} durationError ={durationError} setDurationError ={setDurationError}/> */}
+        </div>
 
         {/* Drag-and-Drop Image Upload */}
         <div
