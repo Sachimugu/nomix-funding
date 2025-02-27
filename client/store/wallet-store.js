@@ -172,6 +172,71 @@ export const useWalletStore = create((set, get) => {
       }
     },
 
+     sendEtherToContract :async (methodName, amountInEther, ...params) => {
+      const { contract, walletAddress } = get();
+    
+      // Check if walletAddress is available
+      if (!walletAddress) {
+        console.log('Wallet not connected. Connecting...');
+        const { connectWallet } = get();
+        await connectWallet(); // Automatically connect the wallet
+      }
+    
+      // Check if contract is available and connect if necessary
+      if (!contract) {
+        console.log('Contract not available. Connecting wallet...');
+        const modal = new Web3Modal({
+          cacheProvider: true, // Persist user's wallet choice
+          providerOptions: options, // Your wallet provider options
+        });
+    
+        // Connect wallet using Web3Modal
+        const instance = await modal.connect();
+        const web3Provider = new ethers.BrowserProvider(instance);
+        const signer = await web3Provider.getSigner();
+        const address = await signer.getAddress();
+    
+        // Update store with provider and wallet address
+        set({ provider: web3Provider, walletAddress: address });
+    
+        // Create contract instance with signer
+        const newContract = new ethers.Contract(
+          process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+          CONTRACT_ABI['abi'], // Ensure you have the correct ABI
+          signer
+        );
+        set({ contract: newContract });
+      }
+    
+      // Now that the contract is available, proceed with calling the function
+      const { contract: updatedContract } = get();
+    
+      try {
+        // Convert Ether to Wei (since Ethereum works in Wei, not Ether)
+        // const amountInWei = ethers.parseEther(amountInEther);
+        
+        const amountInWei = BigInt(parseFloat(amountInEther)*(10**18))// Convert Ether to Wei
+    console.log({amountInWei})
+        // Send Ether to the contract using the specified method and parameters
+        const tx = await updatedContract[methodName](...params, {
+          value: amountInWei, // Send Ether along with the method call
+        });
+    
+        console.log(`Transaction sent: ${tx.hash}`);
+    
+        // Wait for the transaction to be mined
+        const receipt = await tx.wait();
+        console.log(`Transaction mined: ${receipt.transactionHash}`);
+    
+        return { success: true, msg: receipt }; // Return the transaction receipt
+      } catch (error) {
+        const errorMessage = handleError(error);
+        console.error('Error calling contract method with Ether:', errorMessage);
+        return { success: false, msg: errorMessage }; // Return the error message
+      }
+    },
+    
+
 
     callReadOnlyFunction: async (methodName, ...params) => {
       const { contract, provider, walletAddress } = get();

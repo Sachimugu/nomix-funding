@@ -5,12 +5,13 @@ import ReFund from "@/components/ForRefund";
 import WithdrawFunds from "@/components/WithdrawFunds";
 import { convertUsdToWei, convertWeiToUsd, formatNumber, getEthPrice } from "@/lib/EthPrice";
 import { useWalletStore } from "@/store/wallet-store";
+import { ethers } from "ethers";
 import { progress } from "motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function CampaignSingle ({params}) {
-    const { connectWallet, callReadOnlyFunction, callReadOnlyFunctionWithPrivateKey, callTransactionFunction,contract, walletAddress } = useWalletStore();
+    const { connectWallet, sendEtherToContract, callReadOnlyFunctionWithPrivateKey, callTransactionFunction,contract, walletAddress } = useWalletStore();
   
 
     
@@ -50,11 +51,12 @@ export default function CampaignSingle ({params}) {
       // console.log(`Contributing: ${amountInEth} USD which equals to ${amountInEther} ETH`);
   
       // Call the contribute method
-      const amount = parseInt(amountInEth)
-      console.log({ amount,amountInEth})
-      const data = await callTransactionFunction('contribute', campaignId, {
-        value:amount
-      });
+      // const amount = parseInt(amountInEth)
+      // const amountInWei = ethers.parseEther(amount.toString());
+
+      // let x = 42;
+console.log({x:typeof amountInEth})
+      const data = await sendEtherToContract('contribute',amountInEth, campaignId);
   
       // setAmountInEth(''); // Reset the input after the transaction
   };
@@ -238,7 +240,7 @@ export default function CampaignSingle ({params}) {
                         name="value"
                         className="mt-1 p-2 w-full border-[1px] border-gray-400 rounded bg-gray-200 focus:outline-none focus:ring-gray-500 focus:ring-[0.6px]"
                         onChange={(e) => {
-                          setAmountInEth(Math.abs(e.target.value));
+                          setAmountInEth(e.target.value);
                         }}
                       />
                       {amountInEth && (

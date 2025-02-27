@@ -48,7 +48,7 @@ contract CrowdFunding {
     }
 
 
-    function etherToWei(uint256 _etherAmount) public view returns (uint256) {
+    function etherToWei(uint256 _etherAmount) public pure returns (uint256) {
         // 1 Ether = 10^18 Wei, so multiply by 10^18 to convert
         return _etherAmount * 10**18;
     }
@@ -128,7 +128,7 @@ contract CrowdFunding {
     // Function to contribute to a campaign
    function contribute(uint256 campaignId) public payable isActive(campaignId) {
     Campaign storage campaign = campaigns[campaignId];
-    require(msg.value > convertUSDToWei(campaign.min_donation), "Contribution must be greater than 0");
+    // require(msg.value > convertUSDToWei(campaign.min_donation), "Contribution must be greater than 0");
     require(campaign.goalReached, "Goal reached");
     // require(msg.value == amount, "Sent value does not match the specified amount");
 
