@@ -13,6 +13,8 @@ const Pagination = ({ totalPages, currentPage, setCurrentPage }) => {
 //     }
 //   };
 
+console.log({currentPage, })
+
 
 const handlePageClick = (page) => {
     if (page === "Previous" && currentPage > 1) {

@@ -54,8 +54,14 @@ export default function Home() {
   return (
     <div className="">
       <HeroSection />
-      <BenefitsSection />
+      {/* <BenefitsSection /> */}
+    
+      
       <TeamSection />
+      <div className=" md:hidden ">
+      
+              <SponsorsSection />
+              </div>
       <FeaturesSection />
       <CommunitySection />
       <FooterSection /> 

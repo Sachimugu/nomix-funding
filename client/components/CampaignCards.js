@@ -6,22 +6,9 @@ import PaginationLinks from './PaginationLinks';
 import Link from 'next/link';
 import { formatNumber } from '@/lib/EthPrice';
 import usePaginationStore from '@/store/pagination-store';
+import { ethers } from 'ethers';
 
 // Function to format numbers with K, M, etc.
-
-const dummyData = {
-  pagination: {
-    totalProducts: 50, // Total number of products (50 in this case)
-    page: 1,           // Current page (starting with 1)
-  },
-  products: Array.from({ length: 50 }, (_, index) => ({
-    id: index + 1,
-    name: `Product ${index + 1}`,
-    description: `This is the description for product ${index + 1}.`,
-    imageUrl: `https://via.placeholder.com/150?text=Product+${index + 1}`,
-  })),
-};
-
 const CampaignCards = ({ campaigns }) => {
   const PINATA_BASE_URL = "https://gateway.pinata.cloud/ipfs/";
   // const [currentPage, setCurrentPage] = useState(dummyData.pagination.page);
@@ -35,7 +22,9 @@ const CampaignCards = ({ campaigns }) => {
         const formattedCampaign = {
           index: index + 1,
           creator: campaign.creator,
-          goal: parseFloat(campaign.goal), // Ensure the goal is a number
+          // goal: (campaign.goal), // Ensure the goal is a number
+         goal:formatNumber(parseFloat(ethers.formatUnits(campaign.goal.toString(), 18)) ),
+
           raisedFunds: parseFloat(campaign.raisedFunds || 0), // Example: raised funds value
           imageUrl: `${PINATA_BASE_URL}${campaign.imageUrl}`,
           description: campaign.description,
@@ -107,7 +96,7 @@ const CampaignCards = ({ campaigns }) => {
         );
       })}
     </div>
-    <PaginationLinks dummyData={dummyData}/>
+    <PaginationLinks />
 
     </div>
   );

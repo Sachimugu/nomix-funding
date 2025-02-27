@@ -7,7 +7,7 @@ const benefitList = [
     icon: <Blocks size={32}
     color="hsl(var(--primary))"
     className="mb-6 text-primary"/>,
-    title: "Build Brand Trust",
+    title: "Build Trust",
     description:
       "Showcase transparency, share project updates, and milestones to foster trust and credibility with your community and backers in the Web3 space.",
   },
@@ -39,7 +39,7 @@ const benefitList = [
 
 export const BenefitsSection = () => {
   return (
-    <section id="benefits" className="container py-24 sm:py-32 mx-auto">
+    <section id="benefits" className="container py-32 sm:py-32 mx-auto">
       <div className="grid lg:grid-cols-2 place-items-center lg:gap-24">
         <div>
           <h2 className="text-lg text-primary mb-2 tracking-wider">Benefits</h2>

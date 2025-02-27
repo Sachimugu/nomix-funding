@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import CampaignCards from "./CampaignCards";
 import usePaginationStore from "@/store/pagination-store";
+import { ethers } from "ethers";
 
 const socialIcon = (socialName) => {
   switch (socialName) {
@@ -33,14 +34,21 @@ export const TeamSection = () => {
 
   const { connectWallet, callReadOnlyFunction, contract, walletAddress , callReadOnlyFunctionWithPrivateKey} = useWalletStore();
   const [allCampaigns, setAllCampaigns] = useState([]);
-  const {setTotalPages,setCurrentPage,setTotalCampaigns}=usePaginationStore()
+  const {setTotalPages,setCurrentPage,setTotalCampaigns, currentPage}=usePaginationStore()
+
+  function calculateValue() {
+    const y = 8;  // constant value
+    return (currentPage - 1) * y;
+}
+
 
   const fetchContractData = async () => {
     
-   
+   const x= calculateValue()
+   console.log({xxxxxxxxxxxxxxxx:x,currentPage})
       // const data = await callReadOnlyFunction('getPaginatedCampaigns', 0,8); // Replace with your method name and params
-      const [data, currentPage, totalPages, totalCampaigns] = await callReadOnlyFunctionWithPrivateKey('getPaginatedCampaigns', 0,8);
-      setTotalPages(parseInt(totalPages)),setCurrentPage(parseInt(currentPage)) ,setTotalCampaigns(data.length);
+      const [data, currentPag, totalPages, totalCampaigns] = await callReadOnlyFunctionWithPrivateKey('getPaginatedCampaigns', x ,8);
+      setTotalPages(parseInt(totalPages)),setCurrentPage(parseInt(currentPag)) ,setTotalCampaigns(data.length);
        // Replace with your method name and params
     //  const x = await callReadOnlyFunction('number'); // Replace with your method name and params
       // console.log({x}); // Convert BigNumber to number
@@ -56,7 +64,7 @@ export const TeamSection = () => {
 
   useEffect(()=>{
     fetchContractData();
-  },[])
+  },[currentPage])
 
 
 
@@ -98,13 +106,13 @@ export const TeamSection = () => {
  
 
   return (
-    <section id="team" className="container lg:w-[75%] py-24 sm:py-32 mx-auto">
+    <section id="team" className="container lg:w-[75%] py-32 sm:py-32 mx-auto">
       <div>
    
     </div>
       <div className="text-center mb-8">
-        <h2 className="text-lg text-primary text-center mb-2 tracking-wider">Team</h2>
-        <h2 className="text-3xl md:text-4xl text-center font-bold">The Company Dream Team</h2>
+        <h2 className="text-lg text-primary text-center mb-2 tracking-wider">Campaigns</h2>
+        <h2 className="text-3xl md:text-4xl text-center font-bold">Active Campaigns </h2>
       </div>
 
      

@@ -95,6 +95,9 @@ contract CrowdFunding {
         _;
     }
 
+// Mapping to store campaign IDs by the image URL hash
+mapping(string => uint256) public imageToCampaign;
+
     // Function to create a new campaign
     function createCampaign(string memory _name, string memory _description, uint256 _goal, uint256 _duration, uint256 _min_donation, string memory _imageUrl  ) public {
         require(_goal > 0, "Goal must be greater than 0");
@@ -121,9 +124,21 @@ contract CrowdFunding {
 
         uint256 campaignId = campaigns.length - 1;
         campaignIds.push(campaignId);
+        imageToCampaign[_imageUrl] = campaignId;
 
         emit CampaignCreated(campaignId, msg.sender, _goal, deadline, _description);
     }
+
+    function getCampaignByImageUrl(string memory _imageUrl) public view returns (Campaign memory) {
+    uint256 campaignId = imageToCampaign[_imageUrl];  // Fetch the campaign ID using the image URL hash
+    
+    // Check if the campaign ID is valid (not zero)
+    require(campaignId < campaigns.length, "Campaign not found");
+    
+    // Return the campaign details
+    return campaigns[campaignId];
+}
+
 
     // Function to contribute to a campaign
    function contribute(uint256 campaignId) public payable isActive(campaignId) {
