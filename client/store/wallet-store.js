@@ -228,7 +228,7 @@ export const useWalletStore = create((set, get) => {
         const receipt = await tx.wait();
         console.log(`Transaction mined: ${receipt.transactionHash}`);
     
-        return { success: true, msg: receipt }; // Return the transaction receipt
+        return { success: true, msg: receipt, hash:tx.hash }; // Return the transaction receipt
       } catch (error) {
         const errorMessage = handleError(error);
         console.error('Error calling contract method with Ether:', errorMessage);

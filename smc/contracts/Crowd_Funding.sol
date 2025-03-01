@@ -1,51 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.28;
-import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
-contract CrowdFunding {
-
-  AggregatorV3Interface internal priceFeed;
-
-    constructor(address _priceFeedAddress) {
-        // Initialize the price feed address for Sepolia ETH/USD (this is just an example, please ensure you use the correct address for Sepolia network)
-        priceFeed = AggregatorV3Interface(_priceFeedAddress);// Sepolia ETH/USD address
-    }
-
-     function getLatestPrice() public view returns (int) {
-    (, int price, , , ) = priceFeed.latestRoundData();
-    // Scale the price down to 2 decimal places
-    int scaledPrice = price / 10**6;  // Divide by 10^6 to move the decimal point
-    return scaledPrice;  // Price in 2 decimal places
-}
-
-
-    function convertUSDToWei(uint256 usdAmount) public view returns (uint256) {
-        // Get the current ETH price in USD
-        int ethPriceInUSD = getLatestPrice();
-        require(ethPriceInUSD > 0, "Failed to fetch ETH price");
-
-        // Convert USD to ETH (in ETH)
-        uint256 ethAmount = (usdAmount * 10**2) / uint256(ethPriceInUSD); // ETH price has 8 decimals
-
-        // Convert ETH to Wei (1 ETH = 10^18 Wei)
-        uint256 ethAmountInWei = ethAmount * 10**18;
-
-        return ethAmountInWei;
-    }
-
-    // Convert Wei to USD
-    function convertWeiToUSD(uint256 weiAmount) public view returns (uint256) {
-        // Get the current ETH price in USD
-        int ethPriceInUSD = getLatestPrice();
-        require(ethPriceInUSD > 0, "Failed to fetch ETH price");
-
-        // Convert Wei to ETH (1 ETH = 10^18 Wei)
-        uint256 ethAmount = weiAmount / 10**18;
-
-        // Convert ETH to USD
-        uint256 usdAmount = (ethAmount * uint256(ethPriceInUSD)) / 10**2; // ETH price has 8 decimals
-
-        return usdAmount;
-    }
+pragma solidity ^0.8.26;
+contract CrowdFunding {    
 
 
     function etherToWei(uint256 _etherAmount) public pure returns (uint256) {
@@ -71,7 +26,7 @@ contract CrowdFunding {
     // Array to store all campaigns
     Campaign[] public campaigns;
     uint256[] public campaignIds;
-    int public EthPrice = getLatestPrice();
+   
 
     // Mapping to track dress to campaign
     mapping(address => Campaign) public addressToCampaign;
@@ -129,22 +84,21 @@ mapping(string => uint256) public imageToCampaign;
         emit CampaignCreated(campaignId, msg.sender, _goal, deadline, _description);
     }
 
-    function getCampaignByImageUrl(string memory _imageUrl) public view returns (Campaign memory) {
+   function getCampaignByImageUrl(string memory _imageUrl) public view returns (Campaign memory, uint256) {
     uint256 campaignId = imageToCampaign[_imageUrl];  // Fetch the campaign ID using the image URL hash
     
-    // Check if the campaign ID is valid (not zero)
+    // Check if the campaign ID is valid (not zero or invalid)
     require(campaignId < campaigns.length, "Campaign not found");
     
-    // Return the campaign details
-    return campaigns[campaignId];
+    // Return the campaign details along with its index
+    return (campaigns[campaignId], campaignId);
 }
-
 
     // Function to contribute to a campaign
    function contribute(uint256 campaignId) public payable isActive(campaignId) {
     Campaign storage campaign = campaigns[campaignId];
     // require(msg.value > convertUSDToWei(campaign.min_donation), "Contribution must be greater than 0");
-    require(campaign.goalReached, "Goal reached");
+    require(!campaign.goalReached, "Goal reached");
     // require(msg.value == amount, "Sent value does not match the specified amount");
 
     campaign.totalFunds += msg.value;
@@ -158,6 +112,30 @@ mapping(string => uint256) public imageToCampaign;
     }
 }
 
+
+// function contribute(string memory _imageUrl) public payable isActive(imageToCampaign[_imageUrl]) {
+//     uint256 campaignId = imageToCampaign[_imageUrl];  // Fetch the campaign ID using the image URL
+//     Campaign storage campaign = campaigns[campaignId];
+    
+//     // Ensure the goal has not been reached
+//     require(!campaign.goalReached, "Goal reached");
+
+//     // Ensure the contribution is greater than or equal to the minimum donation
+//     require(msg.value >= campaign.min_donation, "Contribution must be greater than or equal to the minimum donation");
+
+//     // Update the campaign's total funds
+//     campaign.totalFunds += msg.value;
+//     campaign.donations.push(msg.value);
+//     campaign.donors.push(msg.sender);
+    
+//     // Emit the DonationMade event
+//     emit DonationMade(campaignId, msg.sender, msg.value);
+
+//     // Check if the goal has been reached
+//     if (campaign.totalFunds >= campaign.goal) {
+//         campaign.goalReached = true;
+//     }
+// }
 
 
     // Function to allow users to claim refunds if the goal wasn't met

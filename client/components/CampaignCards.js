@@ -42,7 +42,7 @@ const CampaignCards = ({ campaigns }) => {
 
 
         return (
-          <Link href={`/${index}`}> 
+          <Link href={`/${campaign.imageUrl}`}> 
           
           <Card key={formattedCampaign.index} className="bg-muted/60 dark:bg-card flex flex-col h-full overflow-hidden group/hoverimg">
             <CardHeader className="p-0 gap-0">

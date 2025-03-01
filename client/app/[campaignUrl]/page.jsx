@@ -45,23 +45,27 @@ export default function CampaignSingle({ params }) {
     useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [campaign, setCampaign] = useState();
+  const [campaignId, setCampaignId] = useState();
   const [ethPrice, setEthPrice] = useState();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (event) => {
     setIsLoading(true);
     event.preventDefault();
-    const { campaignId } = await params;
+    // const { campaignUrl } = await params;
 
-    console.log({ x: typeof amountInEth });
+    console.log({
+      amountInEth,
+      campaignId:parseInt(campaignId)
+    });
     const data = await sendEtherToContract(
       "contribute",
       amountInEth,
-      campaignId
+      parseInt(campaignId)
     );
 
-    setAmountInEth("");
     setIsLoading(false);
+    setAmountInEth("");
     // Reset the input after the transaction
   };
 
@@ -78,7 +82,7 @@ export default function CampaignSingle({ params }) {
   };
 
   const ForRefund = () => {
-    console.log("ForRefund0000000"); //
+    // console.log("ForRefund0000000"); //
     setIsDialogOpenForRefund(true);
   };
 
@@ -96,16 +100,16 @@ export default function CampaignSingle({ params }) {
       const ethgoal = (parseFloat(campaign.goal) / eth).toFixed(1); // Round to 1 decimal place
       const ethtotalFunds = (parseFloat(totalFunds) / eth).toFixed(1); // Round to 1 decimal place
 
-      console.log({ totalFunds, goal });
+      // console.log({ totalFunds, goal });
 
-      console.log({ ethgoal });
+      // console.log({ ethgoal });
       const donations = await Promise.all(
         campaign.donations.map(async (donation) => {
           return await convertWeiToUsd(parseInt(donation)); // Convert BigNumber array
         })
       );
       const PINATA_BASE_URL = "https://gateway.pinata.cloud/ipfs/";
-
+console.log({imageur:`${campaign.imageUrl}`})
       return {
         creator: campaign.creator,
         goal, // Convert BigNumber to number
@@ -133,17 +137,17 @@ export default function CampaignSingle({ params }) {
 
   useEffect(() => {
     const fetchContractData = async () => {
-      const { campaignId } = await params;
+      const { campaignUrl } = await params;
 
       const eth = await getEthPrice();
       setEthPrice(eth); // Replace with your method name and params
       const data = await callReadOnlyFunctionWithPrivateKey(
-        "getCampaignByIndex",
-        campaignId
+        "getCampaignByImageUrl",
+        campaignUrl
       );
-      console.log({ data }); // Replace with your method name and params
-      const campaignDetails = await formatCampaignData(data);
-      console.log({ campaignDetails });
+      // console.log({ data }); // Replace with your method name and params
+      const campaignDetails = await formatCampaignData(data[0]);
+      setCampaignId(data[1]);
       setCampaign(campaignDetails);
     };
 
@@ -151,7 +155,7 @@ export default function CampaignSingle({ params }) {
     // setAmountInEth('')// Replace with your method name and params
   }, [amountInEth]);
 
-  console.log(campaign);
+  // console.log(campaign);
 
   return (
     <div>
@@ -167,7 +171,7 @@ export default function CampaignSingle({ params }) {
                 {campaign?.description.slice(0, 150)}
               </p>
               <a
-                href={`https://rinkeby.etherscan.io/address/$}`}
+                href={`https://sepolia.etherscan.io/txs?a=${campaign?.creator}`}
                 className=" text-orange-600 hover:text-orange-700"
               >
                 <p className="pt-4">View on Sepolia Etherscan</p>
