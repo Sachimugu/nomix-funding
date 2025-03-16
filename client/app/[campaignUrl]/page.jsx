@@ -23,7 +23,6 @@ export default function CampaignSingle({ params }) {
     callReadOnlyFunctionWithPrivateKey,
     callTransactionFunction,
     contract,
-    walletAddress,
   } = useWalletStore();
 
   // const dummyData = {

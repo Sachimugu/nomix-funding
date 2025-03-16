@@ -32,7 +32,7 @@ export const TeamSection = () => {
 
 
 
-  const { connectWallet, callReadOnlyFunction, contract, walletAddress , callReadOnlyFunctionWithPrivateKey} = useWalletStore();
+  const { connectWallet, callReadOnlyFunction, contract , callReadOnlyFunctionWithPrivateKey} = useWalletStore();
   const [allCampaigns, setAllCampaigns] = useState([]);
   const {setTotalPages,setCurrentPage,setTotalCampaigns, currentPage}=usePaginationStore()
 
