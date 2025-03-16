@@ -39,10 +39,14 @@ export const options = {
 };
 
 export const useWalletStore = create((set, get) => {
-  // Try to load wallet address and contract from localStorage
+  if (typeof window !== "undefined") {
+    // Safe to use localStorage
+  }
   const walletAddress = localStorage.getItem('walletAddress');
   const contractAddress = localStorage.getItem('contractAddress');
   
+  
+  // Try to load wallet address and contract from localStorage
   // Initial state with persisted values (if any)
   return {
   
@@ -105,10 +109,13 @@ export const useWalletStore = create((set, get) => {
           console.error('Contract is not available after setting.');
         }
     
+        if (typeof window !== "undefined") {
+          // Safe to use localStorage
+          localStorage.setItem('walletAddress', address);
+          localStorage.setItem('contractAddress', process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
+      
+        }
         // Save wallet and contract data to localStorage
-        localStorage.setItem('walletAddress', address);
-        localStorage.setItem('contractAddress', process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
-    
       } catch (error) {
         console.error('Error connecting wallet:', error);
       }
@@ -326,9 +333,12 @@ callReadOnlyFunctionWithPrivateKey : async (methodName, ...params) => {
 },
     // Disconnect wallet
     disconnectWallet: () => {
-      // Clear localStorage
-      localStorage.removeItem('walletAddress');
-      localStorage.removeItem('contractAddress');
+      if (typeof window !== "undefined") {
+        // Safe to use localStorage
+        // Clear localStorage
+        localStorage.removeItem('walletAddress');
+        localStorage.removeItem('contractAddress');
+      }
 
       // Reset store state
       set({
