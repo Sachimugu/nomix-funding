@@ -1,7 +1,6 @@
 'use client'
 import { Wallet } from "lucide-react";
 import React, { useState } from "react";
-import Web3Modal from "web3modal";
 import {useWalletStore} from "@/store/wallet-store";
 import { ethers } from "ethers";
 // import { connectWalletAddr, disconnectWalletAddr } from "@/lib/connect-wallet";

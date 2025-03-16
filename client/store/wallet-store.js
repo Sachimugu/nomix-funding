@@ -43,11 +43,11 @@ export const useWalletStore = create((set, get) => {
     const walletAddress = localStorage.getItem('walletAddress');
     const contractAddress = localStorage.getItem('contractAddress');
 
-    // // Persisted state with values from localStorage (if available)
-    // set({
-    //   walletAddress: walletAddress || null,
-    //   CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || contractAddress || "",
-    // });
+    // Persisted state with values from localStorage (if available)
+    set({
+      walletAddress: walletAddress || null,
+      CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || contractAddress || "",
+    });
   }
   
   // Try to load wallet address and contract from localStorage
