@@ -36,7 +36,7 @@ export const createCampaign = async (name, description, goal, duration, image) =
 export const contribute = async (campaignId, amount) => {
   const contract = getContract();
   try {
-    const tx = await contract.contribute(campaignId, { value: ethers.utils.parseEther(amount.toString()) });
+    const tx = await contract.contribute(campaignId, { value: ethers.parseEther(amount.toString()) });
     await tx.wait();
     console.log("Contribution made successfully!");
   } catch (error) {
@@ -73,7 +73,7 @@ export const getCampaignProgress = async (campaignId) => {
   const contract = getContract();
   try {
     const [totalFunds, percentage] = await contract.getCampaignProgress(campaignId);
-    return { totalFunds: ethers.utils.formatEther(totalFunds), percentage };
+    return { totalFunds: ethers.formatEther(totalFunds), percentage };
   } catch (error) {
     console.error("Error getting campaign progress:", error);
   }

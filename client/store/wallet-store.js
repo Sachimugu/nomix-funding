@@ -33,7 +33,7 @@ export const options = {
       description: "Connect with your local Hardhat node",
     },
     package: {
-      getProvider: () => new ethers.providers.JsonRpcProvider("http://localhost:8545"),
+      getProvider: () => new ethers.JsonRpcProvider("http://localhost:8545"),
     },
   },
 };

@@ -2,7 +2,7 @@
 
 import { ethers } from 'ethers';
 
-const provider = new ethers.providers.Web3Provider(window.ethereum);
+const provider = new ethers.Web3Provider(window.ethereum);
 
 // Replace with your contract's ABI and address
 const contractABI = [/* ABI of your contract */];

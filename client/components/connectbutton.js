@@ -34,7 +34,7 @@ const optionsc =  {
     },
     package: {
       // Custom provider for Hardhat node
-      getProvider: () => new ethers.providers.JsonRpcProvider("http://localhost:8545"), // Hardhat node URL
+      getProvider: () => new ethers.JsonRpcProvider("http://localhost:8545"), // Hardhat node URL
     },
   },
 }
@@ -54,7 +54,7 @@ const options = {
     },
     package: {
       // Custom provider for Hardhat node
-      getProvider: () => new ethers.providers.JsonRpcProvider("http://localhost:8545"), // Hardhat node URL
+      getProvider: () => new ethers.JsonRpcProvider("http://localhost:8545"), // Hardhat node URL
     },
   },}
 const ConnectButton = () => {
