@@ -3,11 +3,8 @@ import { Loader, UploadCloud } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import axios from "axios";
-import { createCampaign } from "@/lib/crowdFunding";
 import DatePicker from "@/components/DatePicker";
 import { useWalletStore } from "@/store/wallet-store";
-import { convertUsdToWei } from "@/lib/EthPrice";
-import { toBigInt } from "ethers";
 
 
 export default function CampaignForm() {
