@@ -56,7 +56,7 @@ export const useWalletStore = create((set, get) => {
   
     provider: null,
     contract: null,
-    walletAddress: walletAddress || null,
+    walletAddress: null,
     _CONTRACT_ABI: CONTRACT_ABI['abi'],
     CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || contractAddress || "",
 
