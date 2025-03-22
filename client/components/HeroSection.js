@@ -13,11 +13,11 @@ import SponsorsSection from "./Sponsors";
 export const HeroSection = () => {
   const { theme } = useTheme();
   return (
-    <BackgroundLines className="lg:max-w-screen-xl mx-auto  py-20 md:py-32">
+    <BackgroundLines className="lg:max-w-screen-xl mx-auto  py-8 md:py-32">
       <div className="">
         <div className="grid place-items-center  gap-8 mx-auto">
           <div className="text-center space-y-8">
-            <Badge variant="outline" className="text-sm py-2">
+            <Badge variant="outline" className="text-sm py-2 mx-4">
               <span className="mr-2 text-primary">
                 <Badge className="">New</Badge>
               </span>
@@ -40,7 +40,7 @@ export const HeroSection = () => {
             creators. Get access to exclusive resources, tutorials, and support.`}
             </p>
             <div className="flex items-center justify-center gap-2  md:space-y-0 md:space-x-4 py-8">
-              <SlideArrowButton className="" />
+              <SlideArrowButton className="md:mt-4 mt-2" />
 
               {/* <Button
                 // asChild
@@ -59,7 +59,7 @@ export const HeroSection = () => {
 
           </div>
         </div>
-        <div className="hidden md:block ">
+        <div className="hidden md:mt-12 md:block ">
 
         <SponsorsSection />
         </div>

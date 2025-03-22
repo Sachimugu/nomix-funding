@@ -111,7 +111,7 @@ export default function CampaignForm() {
         // const x = await convertUsdToWei(parseInt(campaignTarget))
         // const goal = BigInt(100000000000000000000000000000000000000000000000000000000000000n)
         // console.log("Converted USD target to Wei:", goal)
-        await handleCreateCampaign(campaignName, campaignDescription, campaignTarget, duration, minDonation, ipfsHash,)
+        const x  =await handleCreateCampaign(campaignName, campaignDescription, campaignTarget, duration, minDonation, ipfsHash,)
 
     setIsLoading(false)
       
@@ -151,6 +151,7 @@ export default function CampaignForm() {
 
     // Create new campaign
     const handleCreateCampaign = async (name, description, campaignTarget, duration, minDonation, image) => {
+    console.log("Create campaign")
       try {
           const txReceipt = await callTransactionFunction('createCampaign', name, description, parseInt(campaignTarget), parseInt(duration), parseInt(minDonation), image); // Replace with your function and params
         console.log('Transaction receipt:', txReceipt);
