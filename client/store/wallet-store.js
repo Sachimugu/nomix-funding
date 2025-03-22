@@ -59,7 +59,7 @@ export const useWalletStore = create((set, get) => {
   return {
   
     provider: null,
-    contract: null,
+    contract: Walletandcontacts()[1]|| null,
     walletAddress: Walletandcontacts()[0]|| null,
     _CONTRACT_ABI: CONTRACT_ABI['abi'],
     CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || contractAddress || "",
@@ -163,7 +163,8 @@ export const useWalletStore = create((set, get) => {
           process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
           CONTRACT_ABI['abi'], // Ensure you have the correct ABI
           signer
-        );// Attempt to connect wallet and set contract
+        );
+        console.log({newContract})// Attempt to connect wallet and set contract
         set({ contract: newContract });
     ; // Ensure contract is available
       }
