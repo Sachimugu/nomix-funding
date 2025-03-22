@@ -39,16 +39,20 @@ export const options = {
 };
 
 export const useWalletStore = create((set, get) => {
-  if (typeof window !== "undefined") {
-    const walletAddress = localStorage.getItem('walletAddress');
-    const contractAddress = localStorage.getItem('contractAddress');
 
-    // Persisted state with values from localStorage (if available)
-    set({
-      walletAddress: walletAddress || null,
-      CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || contractAddress || "",
-    });
+  const Walletandcontacts = () => {
+    let swalletAddress = null;
+    let scontractAddress = null;
+  
+    if (typeof window !== "undefined") {
+      swalletAddress = localStorage.getItem('walletAddress');
+      scontractAddress = localStorage.getItem('contractAddress');
+    }
+  
+    // Return the values as an object
+    return { swalletAddress, scontractAddress };
   }
+
   
   // Try to load wallet address and contract from localStorage
   // Initial state with persisted values (if any)
@@ -56,7 +60,7 @@ export const useWalletStore = create((set, get) => {
   
     provider: null,
     contract: null,
-    walletAddress: null,
+    walletAddress: Walletandcontacts()[0]|| null,
     _CONTRACT_ABI: CONTRACT_ABI['abi'],
     CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || contractAddress || "",
 
