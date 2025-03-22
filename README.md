@@ -1,7 +1,8 @@
 # Nomix  DApp: A Decentralized Crowdfunding
+![Image 2](./assets/device2.png)
+
 |  | |
 |---------|---------| 
-| ![Image 1](./assets/device1.png) | ![Image 2](./assets/device2.png)|
 | ![Image 1](./assets/device3.png) | ![Image 2](./assets/device4.png)|
 
 
