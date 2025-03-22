@@ -1,5 +1,7 @@
 # Nomix  DApp: A Decentralized Crowdfunding
 Welcome to the **CrowdFunding DApp**, a decentralized crowdfunding platform built on Ethereum. This project showcases a fully functional smart contract for managing crowdfunding campaigns, integrated with IPFS for decentralized image storage, and a modern front-end built with **Next.js**. This repository is designed to demonstrate my skills in blockchain development, smart contract design, and full-stack development.
+
+
 ![Image 2](./assets/device2.png)
 
 |  | |
