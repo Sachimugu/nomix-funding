@@ -145,3 +145,6 @@ The front-end is built with **Next.js**, providing a modern and responsive user 
    - Campaign creators can withdraw funds once the goal is met.
 
 ---
+
+![Image 2](./assets/device1.png)
+
